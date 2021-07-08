@@ -1,0 +1,35 @@
+name: Deploy Static Portal
+
+on:
+  workflow_dispatch:  
+  push:
+    branches: 
+      - master 
+      
+jobs:
+  generate-portal:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Install zip
+      uses: montudor/action-zip@v0.1.1
+      
+    - uses: actions/checkout@v1
+      name : checkout-repo
+      id: checkout-repo  
+      
+    - name: Zip files
+      run: zip -qq -r portal-input.zip .
+      
+    - name: Call build endpoint
+      run: curl -X POST --url 'https://titan.apimatic.io/api/build' -F 'file=@portal-input.zip' -o portal-output.zip
+      
+    - name: Extract generated SDK
+      working-directory: 'spec'
+      run: unzip -qq portal-output.zip -d static-portal
+      
+    - name: list 
+      run: echo "ls"
+    
+      
