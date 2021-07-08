@@ -1,0 +1,99 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "APIMATIC Calculator",
+    "description": "Simple calculator API hosted on APIMATIC",
+    "contact": {}
+  },
+  "host": "examples.apimatic.io",
+  "basePath": "/apps/calculator",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/{operation}": {
+      "get": {
+        "description": "Calculates the expression using the specified operation.",
+        "summary": "Calculate",
+        "tags": [
+          "Simple Calculator"
+        ],
+        "operationId": "Calculate",
+        "deprecated": false,
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "operation",
+            "in": "path",
+            "required": true,
+            "enum": [
+              "SUM",
+              "SUBTRACT",
+              "MULTIPLY",
+              "DIVIDE"
+            ],
+            "type": "string",
+            "description": "The operator to apply on the variables"
+          },
+          {
+            "name": "x",
+            "in": "query",
+            "required": true,
+            "type": "number",
+            "format": "double",
+            "description": "The LHS value"
+          },
+          {
+            "name": "y",
+            "in": "query",
+            "required": true,
+            "type": "number",
+            "format": "double",
+            "description": "The RHS value"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            },
+            "examples": {
+              "text/plain": 20
+            },
+            "headers": {}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "OperationType": {
+      "title": "OperationType",
+      "description": "Possible operators are sum, subtract, multiply, divide",
+      "type": "string",
+      "enum": [
+        "SUM",
+        "SUBTRACT",
+        "MULTIPLY",
+        "DIVIDE"
+      ]
+    }
+  },
+  "tags": [
+    {
+      "name": "Simple Calculator",
+      "description": ""
+    }
+  ]
+} 
