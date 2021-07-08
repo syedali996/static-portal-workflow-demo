@@ -29,7 +29,6 @@ jobs:
       run: ls
       
     - name: Extract generated SDK
-      working-directory: 'spec'
       run: unzip -qq portal-output.zip -d static-portal
       
     - name: list 
