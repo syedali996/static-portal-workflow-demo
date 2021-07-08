@@ -25,6 +25,9 @@ jobs:
     - name: Call build endpoint
       run: curl -X POST --url 'https://titan.apimatic.io/api/build' -F 'file=@portal-input.zip' -o portal-output.zip
       
+    - name: list 
+      run: echo "ls"
+      
     - name: Extract generated SDK
       working-directory: 'spec'
       run: unzip -qq portal-output.zip -d static-portal
