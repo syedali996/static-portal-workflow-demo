@@ -1452,7 +1452,7 @@ paths:
       tags:
         - Spend Back
       description: |
-        [⭻⭻ Reference](page:working-with-resources/spendbacks#list-spend-backs) Retrieve a list of all spendbacks that supports filtering, sorting, and pagination through existing mechanisms.
+        [⭻⭻ Reference](page:guides/guide1.md) Retrieve a list of all spendbacks that supports filtering, sorting, and pagination through existing mechanisms.
       security:
         - client Credential Grant Flow:
             - read-only
