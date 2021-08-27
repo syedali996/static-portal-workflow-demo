@@ -1,99 +1,4337 @@
-{
-  "swagger": "2.0",
-  "info": {
-    "version": "1.0",
-    "title": "APIMATIC Calculator",
-    "description": "Simple calculator API hosted on APIMATIC",
-    "contact": {}
-  },
-  "host": "examples.apimatic.io",
-  "basePath": "/apps/calculator",
-  "schemes": [
-    "http"
-  ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
-  "paths": {
-    "/{operation}": {
-      "get": {
-        "description": "Calculates the expression using the specified operation.",
-        "summary": "Calculate",
-        "tags": [
-          "Simple Calculator"
-        ],
-        "operationId": "Calculate",
-        "deprecated": false,
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "operation",
-            "in": "path",
-            "required": true,
-            "enum": [
-              "SUM",
-              "SUBTRACT",
-              "MULTIPLY",
-              "DIVIDE"
-            ],
-            "type": "string",
-            "description": "The operator to apply on the variables"
-          },
-          {
-            "name": "x",
-            "in": "query",
-            "required": true,
-            "type": "number",
-            "format": "double",
-            "description": "The LHS value"
-          },
-          {
-            "name": "y",
-            "in": "query",
-            "required": true,
-            "type": "number",
-            "format": "double",
-            "description": "The RHS value"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "number",
-              "format": "double"
-            },
-            "examples": {
-              "text/plain": 20
-            },
-            "headers": {}
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "OperationType": {
-      "title": "OperationType",
-      "description": "Possible operators are sum, subtract, multiply, divide",
-      "type": "string",
-      "enum": [
-        "SUM",
-        "SUBTRACT",
-        "MULTIPLY",
-        "DIVIDE"
-      ]
-    }
-  },
-  "tags": [
-    {
-      "name": "Simple Calculator",
-      "description": ""
-    }
-  ]
-} 
+openapi: 3.0.2
+info:
+  title: PQ API v2
+  version: 2021.06.17
+  contact:
+    email: support@payquicker.com
+    url: 'https://www.payquicker.com'
+    name: PayQuicker Support
+  description: desc
+  termsOfService: 'https://www.payquicker.com'
+servers:
+  - url: 'https://platform.mypayquicker.build/api/v2'
+    description: ''
+paths:
+  '/accounts/{acct-token}/receipts':
+    get:
+      summary: List Account Receipts
+      operationId: get-accounts-receipts
+      description: |
+        [Retrieve a list](page:working-with-resources/receipts#list-account-receipts) of all account(s) receipts that supports filtering, sorting, and pagination through existing mechanisms.'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                Account Receipt Collection:
+                  value:
+                    payload:
+                      - amount: 5000.01
+                        currency: USD
+                        sourceToken: acct-04017f57-8526-4b0c-9152-5252975a86e4
+                        destinationToken: dest-04017f57-8526-4b0c-9152-5252975a86e4
+                        createdOn: '2023-02-21T00:00:00Z'
+                    meta:
+                      pageNo: '1'
+                      pageSize: '20'
+                      pageCount: '85'
+                      recordCount: '1685'
+                      timezone: GMT
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/accounts/acct-04017f57-8526-4b0c-9152-5252975a86e4/receipts'
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      tags:
+        - Receipts
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters:
+      - $ref: '#/components/parameters/acctTokenParam'
+  '/payments/{pmnt-token}':
+    get:
+      summary: Retrieve Payment
+      operationId: get-payments-pmnt_token
+      description: 'Retrieve a list of all payments that supports filtering, sorting, and pagination through existing mechanisms.'
+      parameters:
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payment-Response'
+      tags:
+        - Payments
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Accept Payment Quote
+      operationId: post-payments-pmnt_token
+      description: Accept an open payment quote.
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payment-Response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      tags:
+        - Payments
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    delete:
+      summary: Cancel Payment Quote
+      operationId: delete-payments-pmnt_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Payments
+      description: Cancel an open payment quote.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/pmntTokenParam'
+  '/payments/{pmnt-token}/retract':
+    put:
+      summary: Retract Payment (Full)
+      operationId: put-payments-pmnt_token-retract
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Payments
+      description: Perform a payment retraction for the full payment amount.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    patch:
+      summary: Retract Payment (Partial)
+      operationId: patch-payments-pmnt_token-retract
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Payments
+      description: Perform a payment retraction for a partial payment amount.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/pmntTokenParam'
+  '/spend-back/{spnd-token}':
+    get:
+      summary: Retrieve Spendback
+      operationId: get-spendback-spnd_token
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: Retrieve a single spendback quote using the spendback token.
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Accept Spendback Quote
+      operationId: post-spendback-spnd_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: Accept an open spendback quote. 
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    delete:
+      summary: Cancel Spendback Quote
+      operationId: delete-spendback-spnd_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: Cancel an open spendback quote. 
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/spndTokenParam'
+  '/spend-back/{spnd-token}/refund':
+    put:
+      summary: Refund Spendback (Full)
+      operationId: put-spendback-spnd_token-refund
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: Perform a spendback refund for the full amount.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    patch:
+      summary: Refund Spendback (Partial)
+      operationId: patch-spendback-spnd_token-refund
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: Perform a spendback refund for a partial amount. 
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/spndTokenParam'
+  '/transfers/{xfer-token}':
+    get:
+      summary: Retrieve Transfer
+      description: Retrieve details of a specific transfer represented by a transfer token.
+      operationId: get-transfers-xfer_token
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-Response'
+      tags:
+        - Transfers
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Accept Transfer Quote
+      description: Accept a transfer quote
+      operationId: post-transfers-xfer_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Transfers
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    delete:
+      summary: Cancel Transfer Quote
+      description: Optional cancellation that auto-cancels after a period organically expires or when account activity invalidates the quote.
+      operationId: delete-transfers-xfer_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Transfers
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/xferTokenParam'
+  '/users/{user-token}':
+    put:
+      responses:
+        '200':
+          description: | 
+            Reference [![this is supposed to be an image](static/images/copy-link-from-portal.gif)](page:custom-content.md)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-Response'
+              examples:
+                US Individual User:
+                  value:
+                    firstName: Jane
+                    lastName: Smith
+                    dateOfBirth: '1977-12-14'
+                    phoneNumber: 760-350-0324
+                    phoneNumberCountry: US
+                    mobileNumber: 213-446-5755
+                    mobileNumberCountry: US
+                    addressLine1: 290 Carriage Court
+                    city: Los Angeles
+                    region: CA
+                    country: US
+                    postalCode: '90017'
+                    addressType: RESIDENTIAL
+                    email: jsmith@payquicker.com
+                    gender: FEMALE
+                    userType: INDIVIDUAL
+                    programUserId: d97ce0519b2d
+                    language: en-US
+                    countryOfBirth: US
+                    countryOfNationality: US
+                    token: user-f012bc86-4d42-415b-a8b2-be5e0b90e59a
+                    status: PRE_ACTIVATED
+                    createdOn: '2020-02-24T22:00:00Z'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a'
+      summary: Update User
+      description: 'Update a user object (change email, address change, etc.) using a user token.'
+      operationId: put-users-user_token
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-Request'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+    get:
+      summary: Retrieve User
+      operationId: get-users-user_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-Response'
+              examples:
+                US Individual User:
+                  value:
+                    firstName: Jane
+                    lastName: Smith
+                    dateOfBirth: '1977-12-14'
+                    phoneNumber: 760-350-0324
+                    phoneNumberCountry: US
+                    mobileNumber: 213-446-5755
+                    mobileNumberCountry: US
+                    addressLine1: 290 Carriage Court
+                    city: Los Angeles
+                    region: CA
+                    country: US
+                    postalCode: '90017'
+                    addressType: RESIDENTIAL
+                    email: jsmith@payquicker.com
+                    gender: FEMALE
+                    userType: INDIVIDUAL
+                    programUserId: d97ce0519b2d
+                    language: en-US
+                    countryOfBirth: US
+                    countryOfNationality: US
+                    token: user-f012bc86-4d42-415b-a8b2-be5e0b90e59a
+                    status: PRE_ACTIVATED
+                    createdOn: '2020-02-24T22:00:00Z'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a'
+      description: Retrieve a single user record by user token.
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+  '/users/{user-token}/balances':
+    get:
+      summary: List User Balances
+      description: 'Retrieve a list of user balances that supports filtering, sorting, and pagination through existing mechanisms.'
+      operationId: get-users-user_token-balances
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/balanceCollection-Response'
+              examples:
+                example 1:
+                  value:
+                    payload:
+                      - formattedAmount: $4.32 USD
+                        amount: 4.32
+                        currency: USD
+                        token: dest-4aed86e2-4929-45bf-814d-9030aef21e79
+                        links:
+                          - params:
+                              rel: self
+                            href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a/prepaid-cards/dest-4aed86e2-4929-45bf-814d-9030aef21e79/balances'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a/balances'
+      tags:
+        - Balances
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  '/users/{user-token}/bank-accounts':
+    get:
+      summary: List Bank Accounts
+      operationId: get-users-user_token-bankaccounts
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bankAccountCollection-Response'
+              examples:
+                Multiple Bank Accounts:
+                  value:
+                    payload:
+                      - token: dest-7d8b1c83-01bb-40fb-87d7-26bd4c303f01
+                        status: DELETED
+                        createdOn: '2020-02-21T22:00:00Z'
+                        bankAccountOwnershipType: PERSONAL
+                        type: CHECKING
+                        fields:
+                          - key: BANK_ACH_ABA
+                            value: '333333333'
+                          - key: BANK_BBAN
+                            value: '4444444444'
+                        bankCurrency: USD
+                        bankCountry: US
+                        description: My account
+                        links:
+                          - params:
+                              rel: self
+                            href: string
+                      - token: dest-efacd12b-a86e-4f44-bbea-927955ec1634
+                        status: ACTIVE
+                        createdOn: '2020-02-21T22:00:00Z'
+                        bankAccountOwnershipType: PERSONAL
+                        type: CHECKING
+                        fields:
+                          - key: BANK_ACH_ABA
+                            value: '012346789'
+                          - key: BANK_BBAN
+                            value: '987654321'
+                        bankCurrency: USD
+                        bankCountry: US
+                        description: Personal checking account
+                        links:
+                          - params:
+                              rel: self
+                            href: string
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+      tags:
+        - Bank Accounts
+      description: 'Retrieve a list of bank accounts that supports filtering, sorting, and pagination through existing mechanisms.'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Create Bank Account
+      operationId: post-users-user_token-bankaccounts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bankAccount-Response'
+              examples:
+                Active Bank Account:
+                  value:
+                    token: dest-efacd12b-a86e-4f44-bbea-927955ec1634
+                    status: ACTIVE
+                    createdOn: '2020-02-21T22:00:00Z'
+                    bankAccountOwnershipType: PERSONAL
+                    type: CHECKING
+                    fields:
+                      - key: BANK_ACH_ABA
+                        value: '012346789'
+                      - key: BANK_BBAN
+                        value: '987654321'
+                    bankCurrency: USD
+                    bankCountry: US
+                    description: Personal checking account
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+      tags:
+        - Bank Accounts
+      description: Create a quote for a bank account using a user token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bankAccount-Request'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  '/users/{user-token}/bank-accounts/{dest-token}':
+    get:
+      summary: Retrieve Bank Account
+      operationId: get-users-user_token-bankaccounts-dest_token
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bankAccount-Response'
+              examples:
+                Active Bank Account:
+                  value:
+                    token: dest-efacd12b-a86e-4f44-bbea-927955ec1634
+                    status: ACTIVE
+                    createdOn: '2020-02-21T22:00:00Z'
+                    bankAccountOwnershipType: PERSONAL
+                    type: CHECKING
+                    fields:
+                      - key: BANK_ACH_ABA
+                        value: '012346789'
+                      - key: BANK_BBAN
+                        value: '987654321'
+                    bankCurrency: USD
+                    bankCountry: US
+                    description: Personal checking account
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+      tags:
+        - Bank Accounts
+      description: 'Retrieve a list of bank accounts using a destination token that supports filtering, sorting, and pagination through existing mechanisms.'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    put:
+      summary: Update Bank Account
+      operationId: put-users-user_token-bankaccounts-dest_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bankAccount-Response'
+              examples:
+                Active Bank Account:
+                  value:
+                    token: dest-efacd12b-a86e-4f44-bbea-927955ec1634
+                    status: ACTIVE
+                    createdOn: '2020-02-21T22:00:00Z'
+                    bankAccountOwnershipType: PERSONAL
+                    type: CHECKING
+                    fields:
+                      - key: BANK_ACH_ABA
+                        value: '012346789'
+                      - key: BANK_BBAN
+                        value: '987654321'
+                    bankCurrency: USD
+                    bankCountry: US
+                    description: Personal checking account
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+      tags:
+        - Bank Accounts
+      description: Update a bank account.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bankAccount-Request'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    delete:
+      summary: Delete Bank Account
+      description: Delete (cloak) a user bank account.
+      operationId: delete-users-user_token-bankaccounts-dest_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Bank Accounts
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/destTokenParam'
+  '/users/{user-token}/bank-accounts/requirements':
+    get:
+      summary: Get Bank Account Requirements
+      description: 'Retrieve requirements for adding a bank account using the parameters provided (user context, given country of residence, supported EFT provider(s), destination currency, destination country, required fields, with names, and regex validation expression) for easy customer wire-up and validation.'
+      operationId: get-users-user_token-bankaccounts-requirements
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bankAccountRequirementCollection-Response'
+              examples:
+                Italy:
+                  value:
+                    payload:
+                      - bankCountry: IT
+                        bankCurrency: EUR
+                        requirements:
+                          - requirement: BANK_IBAN
+                            format:
+                              example: IT43K0310412701000000820420
+                              legend:
+                                - key: IT43K0310412701000000820420
+                                  descriptions:
+                                    - language: en-US
+                                      translation: Example IBAN
+                                    - language: it-IT
+                                      translation: Esempio IBAN
+                            description:
+                              - language: en-US
+                                translation: IBAN
+                              - language: it-IT
+                                translation: IBAN
+                            validators:
+                              - validatorType: REGEX
+                                expression: '^IT\\d{2}[A-Z]\\d{10}[0-9A-Z]{12}$'
+                          - requirement: BANK_SWIFT_BIC
+                            format:
+                              example: '01234567890'
+                              legend:
+                                - key: '01234567890'
+                                  descriptions:
+                                    - language: en-US
+                                      translation: Example Swift/BIC
+                                    - language: it-IT
+                                      translation: Esempio Swift/BIC
+                            description:
+                              - language: en-US
+                                translation: Swift/BIC
+                              - language: it-IT
+                                translation: Swift/BIC
+                            validators:
+                              - validatorType: REGEX
+                                expression: '^[a-z0-9A-Z]{8,11}$'
+                        quote:
+                          formattedAmount: '$4.32 USD (USD, en-US), 0,00 € EUR (EUR, fr-FR)'
+                          amount: 4.32
+                          currency: USD
+                        links:
+                          - params:
+                              rel: self
+                            href: string
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+      tags:
+        - Bank Accounts
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  '/users/{user-token}/documents':
+    get:
+      summary: List User Documents
+      description: 'Retrieve a list of user documents that supports filtering, sorting, and pagination through existing mechanisms.'
+      operationId: get-users-user_token-documents
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Documents
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Create User Document
+      operationId: post-users-user_token-documents
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Documents
+      description: Create a quote for a user document.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  '/users/{user-token}/documents/{docu-token}':
+    get:
+      summary: Retrieve User Document
+      description: Retrieve an individual user document by its document token.
+      operationId: get-users-user_token-documents-docu_token
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Documents
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    put:
+      summary: Replace User Document
+      description: Replace the user document at the given document token.
+      operationId: put-users-user_token-documents-docu_token
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Documents
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/docuTokenParam'
+  '/users/{user-token}/paperchecks':
+    get:
+      summary: List Paper Checks
+      operationId: get-users-user_token-paper-checks
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paperCheckCollection-Response'
+      tags:
+        - Paper Checks
+      description: 'Retrieve a list of paper checks that supports filtering, sorting, and pagination through existing mechanisms.'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Order Paper Check
+      operationId: post-users-user_token-paperchecks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paperCheck-Response'
+      tags:
+        - Paper Checks
+      description: Create a quote for a paper check.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/paperCheck-Request'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  '/users/{user-token}/paper-checks/{xfer-token}':
+    get:
+      summary: Retrieve Paper Check
+      operationId: get-users-user_token-paperchecks-dest_token
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paperCheck-Response'
+      tags:
+        - Paper Checks
+      description: 'Retrieve a list of paper checks by destination token that supports filtering, sorting, and pagination through existing mechanisms.'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    put:
+      summary: Update Paper Check
+      operationId: put-users-user_token-paperchecks-dest_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paperCheck-Response'
+      tags:
+        - Paper Checks
+      description: Create a quote for a paper check.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/xferTokenParam'
+    delete:
+      summary: Cancel Paper Check
+      operationId: delete-users-user_token-paper-checks-dest_token
+      responses:
+        '200':
+          description: OK
+      description: Delete a paper check by destination token.
+      tags:
+        - Paper Checks
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+  '/users/{user-token}/prepaid-cards/{dest-token}':
+    post:
+      summary: Replace Prepaid Card
+      operationId: post-users-user_token-prepaidcards-dest_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCard-Response'
+              examples:
+                example 1:
+                  value:
+                    token: dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d
+                    status: QUEUED
+                    createdOn: '2020-02-21T22:00:00Z'
+                    country: US
+                    currency: USD
+                    cardPersonalization: PERSONALIZED
+                    cardPackage: blue_consumer_10k
+                    cardNetwork: VISA
+                    expires: '2023-02-21T00:00:00Z'
+                    cardNumber: 1234 56** **** 1234
+                    cvv: '123'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/xxx/prepaid-cards/dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d'
+      tags:
+        - Prepaid Cards
+      description: Replace an existing Prepaid Card specifying the replacement reason and the card package for the replacement card.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/prepaidCardReplacement-Request'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/destTokenParam'
+    get:
+      summary: Retrieve Prepaid Card
+      operationId: get-users-user_token-prepaid-cards-dest_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCard-Response'
+              examples:
+                example 1:
+                  value:
+                    token: dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d
+                    status: QUEUED
+                    createdOn: '2020-02-21T22:00:00Z'
+                    country: US
+                    currency: USD
+                    cardPersonalization: PERSONALIZED
+                    cardPackage: blue_consumer_10k
+                    cardNetwork: VISA
+                    expires: '2023-02-21T00:00:00Z'
+                    cardNumber: 1234 56** **** 1234
+                    cvv: '123'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/xxx/prepaid-cards/dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d'
+      description: Retrieve Prepaid Card details by destination token.
+      tags:
+        - Prepaid Cards
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    patch:
+      summary: Update Prepaid Card (Partial)
+      operationId: patch-users-user_token-prepaidcards-dest_token
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCard-Response'
+              examples:
+                example 1:
+                  value:
+                    token: dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d
+                    status: LOCKED
+                    createdOn: '2020-02-21T22:00:00Z'
+                    country: US
+                    currency: USD
+                    cardPersonalization: PERSONALIZED
+                    cardPackage: blue_consumer_10k
+                    cardNetwork: VISA
+                    expires: '2023-02-21T00:00:00Z'
+                    cardNumber: 1234 56** **** 1234
+                    cvv: '123'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/xxx/prepaid-cards/dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/prepaidCardPartialUpdate-Request'
+      description: Partial Prepaid Card update typically used when modifying card status. <i>*Does not require the entire object be passed in the request</i>
+      tags:
+        - Prepaid Cards
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+  '/users/{user-token}/prepaid-cards/{dest-token}/balances':
+    get:
+      summary: List Prepaid Card Balance
+      description: 'Retrieve a list of balances by destination token that supports filtering, sorting, and pagination through existing mechanisms. <i>*If the user belongs to a Flex-based program, balances against the user resource will return the wallet balance only. If it is a pre-paid card program (i.e., Meta USD), this balance and its associated pre-paid card balance will be the same.</i>'
+      operationId: get-users-user_token-prepaidcards-dest_token-balances
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/balanceCollection-Response'
+              examples:
+                example 1:
+                  value:
+                    formattedAmount: $4.32
+                    amount: 4.32
+                    currency: USD
+                    token: dest-4aed86e2-4929-45bf-814d-9030aef21e79
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a/prepaid-cards/dest-4aed86e2-4929-45bf-814d-9030aef21e79/balances'
+      tags:
+        - Balances
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/destTokenParam'
+  '/users/{user-token}/prepaid-cards/{dest-token}/pin':
+    get:
+      summary: Generate PIN Operation Token
+      description: Retrieve one part of a two-part token required to reveal or set a client side PIN. <i>*Not all programs support a reveal or set PIN operation.</i>
+      operationId: get-users-user_token-prepaidcards-dest_token-pin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCardPinToken-Response'
+      tags:
+        - Prepaid Cards
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    put:
+      summary: Set PIN (if supported)
+      description: Allows the setting of a PIN if supported by program.
+      operationId: put-users-user_token-prepaidcards-dest_token-pin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+      tags:
+        - Prepaid Cards
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+        - $ref: '#/components/parameters/prepaidCardTokenParam'
+        - $ref: '#/components/parameters/prepaidCardPinParam'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/destTokenParam'
+    post:
+      summary: Reveal PIN (if supported)
+      operationId: post-users-user_token-prepaid-cards-dest_token-pin
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCardRevealPin-Response'
+      description: Reveals the PIN for a card where PIN reveal functionality is supported in the program and hosted by PayQuicker.
+      tags:
+        - Prepaid Cards
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+        - $ref: '#/components/parameters/prepaidCardTokenParam'
+        - $ref: '#/components/parameters/prepaidCardCvvParam'
+      security:
+        - client Credential Grant Flow:
+            - modify
+  '/users/{user-token}/prepaid-cards/{dest-token}/receipts':
+    get:
+      summary: List Prepaid Card Receipts
+      operationId: get-users-user_token-prepaidcards-receipts
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/receiptCollection-Response'
+              examples:
+                Prepaid Card Receipt Collection:
+                  value:
+                    payload:
+                      - amount: 5000.05
+                        currency: USD
+                        sourceToken: user-04017f57-8526-4b0c-9152-5252975a86e4
+                        destinationToken: dest-04017f57-8526-4b0c-9152-5252975a86e4
+                        createdOn: '2023-02-21T00:00:00Z'
+                    meta:
+                      pageNo: '1'
+                      pageSize: '20'
+                      pageCount: '85'
+                      recordCount: '1685'
+                      timezone: GMT
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-04017f57-8526-4b0c-9152-5252975a86e4/prepaid-cards/dest-04017f57-8526-4b0c-9152-5252975a86e4/receipts'
+          headers:
+            X-TimeZone:
+              $ref: '#/components/headers/X-TimeZone'
+            X-Paging-PageNo:
+              $ref: '#/components/headers/X-Paging-PageNo'
+            X-Paging-PageCount:
+              $ref: '#/components/headers/X-Paging-PageCount'
+            X-Paging-PageSize:
+              $ref: '#/components/headers/X-Paging-PageSize'
+            X-Paging-TotalRecordCount:
+              $ref: '#/components/headers/X-Paging-TotalRecordCount'
+      tags:
+        - Receipts
+      description: 'Retrieve a list all prepaid-card receipts that supports filtering, sorting, and pagination through existing mechanisms.'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/destTokenParam'
+  '/users/{user-token}/receipts':
+    summary: Receipts
+    description: ''
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/receiptCollection-Response'
+              examples:
+                User Receipt Collection:
+                  value:
+                    payload:
+                      - amount: 5000.01
+                        currency: USD
+                        sourceToken: user-04017f57-8526-4b0c-9152-5252975a86e4
+                        destinationToken: dest-04017f57-8526-4b0c-9152-5252975a86e4
+                        createdOn: '2023-02-21T00:00:00Z'
+                    meta:
+                      pageNo: '1'
+                      pageSize: '20'
+                      pageCount: '85'
+                      recordCount: '1685'
+                      timezone: GMT
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-04017f57-8526-4b0c-9152-5252975a86e4/receipts'
+          headers:
+            X-TimeZone:
+              $ref: '#/components/headers/X-TimeZone'
+            X-Paging-PageNo:
+              $ref: '#/components/headers/X-Paging-PageNo'
+            X-Paging-PageCount:
+              $ref: '#/components/headers/X-Paging-PageCount'
+            X-Paging-PageSize:
+              $ref: '#/components/headers/X-Paging-PageSize'
+            X-Paging-TotalRecordCount:
+              $ref: '#/components/headers/X-Paging-TotalRecordCount'
+          description: ''
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      description: 'Retrieve a list all user receipts that supports filtering, sorting, and pagination through existing mechanisms.'
+      operationId: get-users-receipts
+      summary: List User Receipts
+      tags:
+        - Receipts
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  /transfers:
+    summary: Transfers
+    description: ''
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transferCollection-Response'
+          headers:
+            X-TimeZone:
+              $ref: '#/components/headers/X-TimeZone'
+            X-Paging-PageNo:
+              $ref: '#/components/headers/X-Paging-PageNo'
+            X-Paging-PageCount:
+              $ref: '#/components/headers/X-Paging-PageCount'
+            X-Paging-PageSize:
+              $ref: '#/components/headers/X-Paging-PageSize'
+            X-Paging-TotalRecordCount:
+              $ref: '#/components/headers/X-Paging-TotalRecordCount'
+          description: ''
+      summary: List Transfers
+      description: 'Retrieve a list of all transfers that supports filtering, sorting, and pagination through existing mechanisms.'
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      operationId: get-transfers
+      tags:
+        - Transfers
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transfer-Request'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transfer-Response'
+              examples:
+                Successful Transfer Quote:
+                  value:
+                    sourceToken: user-114773fd-85c1-4977-8ce5-24af71f744e9
+                    destinationToken: dest-63947e68-5393-4d00-955d-e0020017924b
+                    notes: string
+                    memo: string
+                    destinationAmount: -1.79
+                    destinationCurrency: USD
+                    clientTransferId: DKKde3Meeiiw34
+                    token: xfer-0c0f2727-6521-47c9-b1fa-f132306d456a
+                    sourceAmount: -1.79
+                    sourceCurrency: USD
+                    status: QUOTED
+                    fx:
+                      destinationAmount: -1.79
+                      destinationCurrency: USD
+                      sourceAmount: -1.79
+                      sourceCurrency: USD
+                      rate: 0.85
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://url.to.com/xfer-0c0f2727-6521-47c9-b1fa-f132306d456a'
+          description: ''
+      summary: Quote Transfer
+      description: 'Create a new quote. <i>*This can be a non-payment card-to-card transfer, prepaid card from Flex (wallet), bank account, or user-to-user transfer.</i>'
+      operationId: post-transfers
+      tags:
+        - Transfers
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+  '/users/{user-token}/prepaid-cards':
+    get:
+      summary: List Prepaid Cards
+      description: 'Retrieve a list of all pre-paid cards by user token that supports filtering, sorting, and pagination through existing mechanisms.'
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      operationId: get-users-user_token-prepaidcards
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCardCollection-Response'
+              examples:
+                example 1:
+                  value:
+                    payload:
+                      - token: dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d
+                        status: QUEUED
+                        createdOn: '2020-02-21T22:00:00Z'
+                        country: US
+                        currency: USD
+                        cardPersonalization: PERSONALIZED
+                        cardPackage: blue_consumer_10k
+                        cardNetwork: VISA
+                        expires: '2023-02-21T00:00:00Z'
+                        cardNumber: 1234 56** **** 1234
+                        cvv: '123'
+                        links:
+                          - params:
+                              rel: self
+                            href: 'https://platform.mypayquicker.com/api/v2/users/xxx/prepaid-cards/dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/xxx/prepaid-cards'
+      tags:
+        - Prepaid Cards
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Order Prepaid Card
+      operationId: post-users-user_token-prepaidcards
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCard-RequestResponse'
+              examples:
+                example 1:
+                  value:
+                    token: dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d
+                    status: QUEUED
+                    createdOn: '2020-02-21T22:00:00Z'
+                    country: US
+                    currency: USD
+                    cardPersonalization: PERSONALIZED
+                    cardPackage: blue_consumer_10k
+                    cardNetwork: VISA
+                    expires: '2023-02-21T00:00:00Z'
+                    cardNumber: 1234 56** **** 1234
+                    cvv: '123'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/xxx/prepaid-cards/dest-37ba1fb7-6136-4216-bb13-f903af6b9f0d'
+      tags:
+        - Prepaid Cards
+      description: 'Order a pre-paid card for the user by specifying a cardPackage. <i>*A package defines the type of card, currency, artwork utilized, and often the method of delivery.</i>'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/prepaidCard-Request'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+  /spend-back:
+    get:
+      summary: List Spend Backs
+      operationId: get-spendback
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: |
+        [⭻⭻ Reference](page:working-with-resources/spendbacks#list-spend-backs) Retrieve a list of all spendbacks that supports filtering, sorting, and pagination through existing mechanisms.
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Quote Spendback
+      operationId: post-spendback
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Spend Back
+      description: 'Create a spendback quote. <i>*Spendbacks can be automatically accepted by setting the `autoAcceptQuote` flag. If not automatically accepted, a POST is required to the spendback endpoint using the token returned in the response. Quotes can be accepted, cancelled, or allowed to expire.</i>'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+      security:
+        - client Credential Grant Flow:
+            - modify
+  /payments:
+    get:
+      summary: List Payments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paymentsCollection-Response'
+      operationId: get-payments
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      tags:
+        - Payments
+      description: 'Retrieve a list of all payments that supports filtering, sorting, and pagination through existing mechanisms.'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    post:
+      summary: Create Payment Quote
+      operationId: post-payments
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payment-Response'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/payment-Request'
+      tags:
+        - Payments
+      description: 'Create a payment quote. '
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - modify
+  '/accounts/{acct-token}/balances':
+    parameters:
+      - $ref: '#/components/parameters/acctTokenParam'
+    get:
+      summary: List Account Balances
+      operationId: get-accounts-acct_token-balances
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/balanceCollection-Response'
+              examples:
+                example 1:
+                  value:
+                    payload:
+                      - formattedAmount: $5.00
+                        amount: 5
+                        currency: USD
+                        token: acct-b3f0570a-6586-4e00-8d6e-8a2bf93cfae4
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/accounts/acct-b3f0570a-6586-4e00-8d6e-8a2bf93cfae4/balances'
+      description: Retrieve a single account balance.
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      tags:
+        - Balances
+      security:
+        - client Credential Grant Flow:
+            - read-only
+  /users:
+    description: 'Everything starts with a user. It is the resource which owns any associated pre-paid cards, bank cards, bank accounts, paper checks, etc. Users can be pre-activated  without email verification required or PayQuicker can host the registration experience. KYC operations will be performed against the user resource even if the KYC requirements are tied to a specific destination token (i.e., PPS GBP Prepaid card, etc.).'
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userCollection-Response'
+              examples:
+                User collection:
+                  value:
+                    payload:
+                      - firstName: Jane
+                        lastName: Smith
+                        dateOfBirth: '1977-12-14'
+                        phoneNumber: 760-350-0324
+                        phoneNumberCountry: US
+                        mobileNumber: 213-446-5755
+                        mobileNumberCountry: US
+                        addressLine1: 290 Carriage Court
+                        city: Los Angeles
+                        region: CA
+                        country: US
+                        postalCode: '90017'
+                        addressType: RESIDENTIAL
+                        email: jsmith@payquicker.com
+                        gender: FEMALE
+                        userType: INDIVIDUAL
+                        programUserId: d97ce0519b2d
+                        language: en-US
+                        countryOfBirth: US
+                        countryOfNationality: US
+                        token: usr-3b8a0c25-c7e2-4bb7-904e-0a2a66001357
+                        status: PRE_ACTIVATED
+                        links:
+                          - params:
+                              rel: self
+                            href: 'https://platform.mypayquicker.com/api/v2/users/usr-3b8a0c25-c7e2-4bb7-904e-0a2a66001357'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users'
+          description: ''
+          headers:
+            X-TimeZone:
+              $ref: '#/components/headers/X-TimeZone'
+            X-Paging-PageNo:
+              $ref: '#/components/headers/X-Paging-PageNo'
+            X-Paging-PageCount:
+              $ref: '#/components/headers/X-Paging-PageCount'
+            X-Paging-PageSize:
+              $ref: '#/components/headers/X-Paging-PageSize'
+            X-Paging-TotalRecordCount:
+              $ref: '#/components/headers/X-Paging-TotalRecordCount'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+      summary: List Users
+      description: 'Retrieve a list of all users that supports filtering, sorting, and pagination through existing mechanisms.'
+      operationId: get-users
+      parameters:
+        - $ref: '#/components/parameters/pageParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/filterParam'
+        - $ref: '#/components/parameters/sortParam'
+        - $ref: '#/components/parameters/languageParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      tags:
+        - Users
+    post:
+      requestBody:
+        description: Body details of the request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-Request'
+            examples:
+              US Individual User:
+                value:
+                  firstName: Jane
+                  lastName: Smith
+                  dateOfBirth: '1977-12-14'
+                  phoneNumber: 760-350-0324
+                  phoneNumberCountry: US
+                  mobileNumber: 213-446-5755
+                  mobileNumberCountry: US
+                  addressLine1: 290 Carriage Court
+                  city: Los Angeles
+                  region: CA
+                  country: US
+                  postalCode: '90017'
+                  addressType: RESIDENTIAL
+                  email: jsmith@payquicker.com
+                  gender: FEMALE
+                  userType: INDIVIDUAL
+                  programUserId: d97ce0519b2d
+                  language: en-US
+                  countryOfBirth: US
+                  countryOfNationality: US
+        required: true
+      responses:
+        '200':
+          description: Previously created user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-Response'
+              examples:
+                US Individual User:
+                  value:
+                    firstName: Jane
+                    lastName: Smith
+                    dateOfBirth: '1977-12-14'
+                    phoneNumber: 760-350-0324
+                    phoneNumberCountry: US
+                    mobileNumber: 213-446-5755
+                    mobileNumberCountry: US
+                    addressLine1: 290 Carriage Court
+                    city: Los Angeles
+                    region: CA
+                    country: US
+                    postalCode: '90017'
+                    addressType: RESIDENTIAL
+                    email: jsmith@payquicker.com
+                    gender: FEMALE
+                    userType: INDIVIDUAL
+                    programUserId: d97ce0519b2d
+                    language: en-US
+                    countryOfBirth: US
+                    countryOfNationality: US
+                    token: user-f012bc86-4d42-415b-a8b2-be5e0b90e59a
+                    status: PRE_ACTIVATED
+                    createdOn: '2020-02-24T22:00:00Z'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a'
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user-Response'
+              examples:
+                US Individual User:
+                  value:
+                    firstName: Jane
+                    lastName: Smith
+                    dateOfBirth: '1977-12-14'
+                    phoneNumber: 760-350-0324
+                    phoneNumberCountry: US
+                    mobileNumber: 213-446-5755
+                    mobileNumberCountry: US
+                    addressLine1: 290 Carriage Court
+                    city: Los Angeles
+                    region: CA
+                    country: US
+                    postalCode: '90017'
+                    addressType: RESIDENTIAL
+                    email: jsmith@payquicker.com
+                    gender: FEMALE
+                    userType: INDIVIDUAL
+                    programUserId: d97ce0519b2d
+                    language: en-US
+                    countryOfBirth: US
+                    countryOfNationality: US
+                    token: user-f012bc86-4d42-415b-a8b2-be5e0b90e59a
+                    status: PRE_ACTIVATED
+                    createdOn: '2020-02-24T22:00:00Z'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a'
+          description: Successfully created user response
+      security:
+        - client Credential Grant Flow:
+            - modify
+      summary: Create User
+      description: 'Create a new user. Payload contains both required and optional fields for user- and company-based users, allowing for the creation of a corporate/partnership/dba (i.e., Grubhub model) user along with a standard end user (i.e., <i>Payee</i>). The type of the user (<i>Business</i> vs. <i>User</i>) and type of business (<i>Corporation</i> vs. <i>Partnership</i>) provide context that impacts KYC etc.'
+      operationId: post-users
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+  '/users/{user-token}/idv-checks':
+    get:
+      summary: List User IDV Checks
+      tags:
+        - Users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identityVerificationCollection-Response'
+              examples:
+                example 1:
+                  value:
+                    payload:
+                      - idvProviderReference: yPV0h4o1Yw3QzdLAvA7a
+                        idvResult: PASS
+                        idvSubResult: HARD
+                        idvProvider: IDOLOGY
+                        createdOn: '2020-02-21T22:00:00Z'
+                        raw: '<RAW IDV processor output, for informational /debugging purposes only>'
+                        idvCheckType: NON_DOCUMENTARY
+                        idvDisposition: FINAL
+                        token: idvc-7e7567e0-c2db-485d-896d-45901a10baa9
+                        links:
+                          - params:
+                              rel: self
+                            href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a/idv-checks/idvc-7e7567e0-c2db-485d-896d-45901a10baa9'
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a/idv-checks'
+      operationId: get-users-user_token-idv-checks
+      description: 'Retrieve a list of IDV checks by user token that supports filtering, sorting, and pagination through existing mechanisms.'
+      parameters:
+        - $ref: '#/components/parameters/userTokenParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+  '/users/{user-token}/idv-checks/{idvc-token}':
+    get:
+      summary: Retrieve User IDV Check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/identityVerification-Response'
+              examples:
+                example 1:
+                  value:
+                    idvProviderReference: yPV0h4o1Yw3QzdLAvA7a
+                    idvResult: PASS
+                    idvSubResult: HARD
+                    idvProvider: IDOLOGY
+                    createdOn: '2020-02-21T22:00:00Z'
+                    raw: '<RAW IDV processor output, for informational/debugging purposes only>'
+                    idvCheckType: NON_DOCUMENTARY
+                    idvDispostion: FINAL
+                    token: idvc-7e7567e0-c2db-485d-896d-45901a10baa9
+                    links:
+                      - params:
+                          rel: self
+                        href: 'https://platform.mypayquicker.com/api/v2/users/user-f012bc86-4d42-415b-a8b2-be5e0b90e59a/idv-checks/idvc-7e7567e0-c2db-485d-896d-45901a10baa9'
+      operationId: get-users-user_token-idv-checks-idvc_token
+      description: 'Retrieve a list of all IDV check by IDVC token that supports filtering, sorting, and pagination through existing mechanisms.'
+      parameters:
+        - $ref: '#/components/parameters/userTokenParam'
+        - $ref: '#/components/parameters/idvcTokenParam'
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      tags:
+        - Users
+      security:
+        - client Credential Grant Flow:
+            - read-only
+  /webhooks:
+    description: 'Retrieve a list of all webhooks. Webhooks allow the client to be notified of events, such as when a payment has been accepted or a user is awaiting document approval.'
+    get:
+      summary: List Webhook Subscriptions
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhookSubscriptionCollection-Response'
+              examples:
+                example 1:
+                  value:
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+                    payload:
+                      - links:
+                          - params:
+                              rel: self
+                            href: string
+                        url: 'https://www.example.com/webhooks'
+                        namespace: BANKACCOUNTS.UPDATED.STATUS.APPROVED
+                        token: webh-2dd54a53-3814-4ce1-862f-dc06b09ead4a
+                        created: '2020-01-01'
+                        lastUpdated: '2020-02-01'
+      operationId: get-webhook
+      description: 'Retrieve a list of all webhook subscriptions that supports filtering, sorting, and pagination through existing mechanisms.'
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    parameters: []
+    post:
+      summary: Create Webhook Subscription
+      operationId: post-webhooks
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook-Subscription-Response'
+              examples:
+                example 1:
+                  value:
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+                    url: 'https://www.example.com/webhooks'
+                    namespace: BANKACCOUNTS.UPDATED.STATUS.APPROVED
+                    token: webh-2dd54a53-3814-4ce1-862f-dc06b09ead4a
+                    created: '2020-01-01'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook-Subscription-Response'
+      description: 'Create a webhook subscription for a given URL and namespace. When this event fires, the webhook receives a call from the API.'
+      security:
+        - client Credential Grant Flow:
+            - modify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook-Subscription-Request'
+        description: ''
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+  '/webhooks/{webh-token}':
+    parameters:
+      - schema:
+          type: string
+        name: webh-token
+        in: path
+        required: true
+    get:
+      summary: Retrieve Webhook Subscription
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook-Subscription-Response'
+              examples:
+                example 1:
+                  value:
+                    links:
+                      - params:
+                          rel: self
+                        href: string
+                    url: 'https://www.example.com/webhooks'
+                    namespace: BANKACCOUNTS.UPDATED.STATUS.APPROVED
+                    token: webh-2dd54a53-3814-4ce1-862f-dc06b09ead4a
+                    created: '2020-01-01'
+                    lastUpdated: '2020-02-01'
+      operationId: get-webhooks-webh-token
+      description: Retrieve a single webhook subscription using the webhook token.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      security:
+        - client Credential Grant Flow:
+            - read-only
+    delete:
+      summary: Delete Webhook Subscription
+      operationId: delete-webhooks-webh-token
+      responses:
+        '200':
+          description: OK
+      description: Delete a webhook subscription. Deleted webhooks no longer receive notifications about events. Deleting an already deleted webhook will result in a successful 200 (OK) response code.
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+      tags:
+        - Webhooks
+      security:
+        - client Credential Grant Flow:
+            - modify
+  '/users/{user-token}/events':
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+    get:
+      summary: List User Events
+      tags:
+        - Users
+      responses:
+        '200':
+          description: OK
+      operationId: get-users-user_token-events
+      description: 'Retrieve a list of all user events that supports filtering, sorting, and pagination through existing mechanisms.'
+  '/users/{user-token}/events/{evnt-token}':
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/eventTokenParam'
+    get:
+      summary: Retrieve User Event
+      tags:
+        - Users
+      responses:
+        '200':
+          description: OK
+      operationId: get-users-user_token-events-event_token
+      description: Retrieve a single user event
+  /programs:
+    get:
+      summary: List Programs
+      tags:
+        - Program
+      responses:
+        '200':
+          description: OK
+      operationId: get-programs
+      description: 'Retrieve a list of all programs that supports filtering, sorting, and pagination through existing mechanisms.'
+  '/programs/{prog-token}':
+    parameters:
+      - $ref: '#/components/parameters/programTokenParam'
+    get:
+      summary: Retrieve Program
+      tags:
+        - Program
+      responses:
+        '200':
+          description: OK
+      operationId: get-programs-prog_token
+      description: Retrieve a single program configuration
+  '/programs/{prog-token}/agreements':
+    parameters:
+      - schema:
+          type: string
+        name: prog-token
+        in: path
+        required: true
+    get:
+      summary: List Program Agreements
+      responses:
+        '200':
+          description: OK
+      operationId: get-programs-prog_token-agreements
+      description: 'Retrieve a list of all program agreements that supports filtering, sorting, and pagination through existing mechanisms.'
+      tags:
+        - Program
+  '/programs/{prog-token}/agreements/{agmt-token}':
+    parameters:
+      - $ref: '#/components/parameters/programTokenParam'
+      - $ref: '#/components/parameters/agreementTokenParam'
+    get:
+      summary: Retrieve Program Agreement
+      responses:
+        '200':
+          description: OK
+      operationId: get-programs-prog_token-agreements-agmt_token
+      description: Retrieve a single program agreement
+      tags:
+        - Program
+  '/users/{user-token}/agreements/{agmt-token}':
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+      - $ref: '#/components/parameters/agreementTokenParam'
+    post:
+      summary: Accept Program Agreement
+      operationId: post-users-user_token-agreements-agmt_token
+      responses:
+        '200':
+          description: OK
+      description: Accept a single program agreement
+      tags:
+        - Users
+  '/users/{user-token}/agreements':
+    parameters:
+      - $ref: '#/components/parameters/userTokenParam'
+    get:
+      summary: List Accepted Program Agreements
+      tags:
+        - Users
+      responses:
+        '200':
+          description: OK
+      operationId: get-users-user_token-agreements
+      description: 'Retrieve a list of all accepted program agreements that supports filtering, sorting, and pagination through existing mechanisms.'
+  '/users/{user-token}/prepaid-cards/{dest-token}/pci':
+    parameters:
+      - schema:
+          type: string
+        name: user-token
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: dest-token
+        in: path
+        required: true
+    get:
+      summary: Generate Prepaid Card Data Token
+      tags:
+        - Prepaid Cards
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCardDataToken-Response'
+      operationId: get-users-user-token-prepaid-cards-dest-token-pci
+      security:
+        - client Credential Grant Flow:
+            - read-only
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+        - $ref: '#/components/parameters/prepaidCardFormatParam'
+        - $ref: '#/components/parameters/prepaidCardSideParam'
+      description: Generate a token used to reveal prepaid card information in the form of image data (base64) or JSON.
+    post:
+      summary: Get Prepaid Card Data
+      operationId: post-users-user-token-prepaid-cards-dest-token-pci
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/prepaidCardData-Response'
+      security:
+        - client Credential Grant Flow:
+            - write
+      parameters:
+        - $ref: '#/components/parameters/X-MyPayQuicker-Version'
+        - $ref: '#/components/parameters/prepaidCardFormatParam'
+        - $ref: '#/components/parameters/prepaidCardSideParam'
+        - $ref: '#/components/parameters/prepaidCardTokenParam'
+      description: 'Return prepaid card data in the form of image data, text, or both.'
+      tags:
+        - Prepaid Cards
+components:
+  schemas:
+    _transferStatusTypes:
+      description: Current status of a transfer
+      enum:
+        - QUOTED
+        - PENDING
+        - SCHEDULED
+        - COMPLETED
+        - CANCELLED
+        - RETURNED
+        - FAILED
+        - EXPIRED
+        - VERIFICATION_HOLD
+      type: string
+    _sourceMonetaryRequired:
+      description: Required details of the monetary source.
+      type: object
+      properties:
+        sourceAmount:
+          format: double
+          type: number
+          description: 'Amount of the transfer in the specified currency.'
+        sourceCurrency:
+          $ref: '#/components/schemas/_currencyTypes'
+      x-examples: {}
+    _haetosSelfRef:
+      description: Indicates the external link with the full URL of the same page on which the link appears.
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/_haetosParams'
+      x-examples: {}
+    _haetosParams:
+      description: Hypermedia as the Engine of Application State (HAETOS) parameters used in a query.
+      type: object
+      properties:
+        params:
+          $ref: '#/components/schemas/_haetosRelationship'
+        href:
+          type: string
+          description: URL for resource described by the relationship.
+      required:
+        - params
+        - href
+      title: ''
+      x-examples: {}
+    _haetosRelationship:
+      description: Indicates the HATEOS relationship between the target and current resources.
+      type: object
+      properties:
+        rel:
+          type: string
+          example: self
+          default: self
+          description: Indicates the relationship between the target and current resources.
+      required:
+        - rel
+      x-examples: {}
+    transfer-Request:
+      description: Request for the transfer
+      allOf:
+        - $ref: '#/components/schemas/transferBase'
+        - $ref: '#/components/schemas/_clientTransferId'
+        - $ref: '#/components/schemas/_destinationMonetaryRequired'
+    transfer:
+      description: Description of the transfer request
+      allOf:
+        - $ref: '#/components/schemas/transferBaseExt'
+        - $ref: '#/components/schemas/_sourceMonetaryRequired'
+        - $ref: '#/components/schemas/_transferStatus'
+        - $ref: '#/components/schemas/_fx'
+      title: ''
+    _expiration:
+      description: Date and time the object will expire
+      type: object
+      properties:
+        expires:
+          type: string
+          description: 'Quote expiration, ISO-8601 format, UTC by default unless overridden.'
+          format: date-time
+          example: '2020-02-07T04:31:52Z'
+      x-examples: {}
+    transfer-Response:
+      allOf:
+        - $ref: '#/components/schemas/transfer'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      x-examples:
+        Successful Transfer:
+          sourceToken: user-114773fd-85c1-4977-8ce5-24af71f744e9
+          destinationToken: dest-63947e68-5393-4d00-955d-e0020017924a
+          notes: string
+          memo: string
+          destinationAmount: -1.79
+          destinationCurrency: USD
+          clientTransferId: DKKde3Meeiiw34
+          token: xfer-0c0f2727-6521-47c9-b1fa-f132306d456a
+          sourceAmount: -1.79
+          sourceCurrency: USD
+          status: QUOTED
+          fx:
+            destinationAmount: -1.79
+            destinationCurrency: USD
+            sourceAmount: -1.79
+            sourceCurrency: USD
+            rate: 0.85
+          links:
+            - params:
+                rel: self
+              href: 'https://url.to.com/xfer-0c0f2727-6521-47c9-b1fa-f132306d456a'
+      title: ''
+    _notBeforeOrAfter:
+      description: ''
+      type: object
+      properties:
+        notBefore:
+          type: string
+          description: 'Transfer is scheduled and will not process before this time.'
+          format: date-time
+          example: '2020-02-07T04:31:52Z'
+        notAfter:
+          type: string
+          description: 'Transfer expires if not completed prior to this time.'
+          format: date-time
+          example: '2020-02-07T04:31:52Z'
+    _address:
+      description: Classifies the mailing address
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          description: 'First line of the address that specifies street number, street name, and building name'
+        addressLine2:
+          type: string
+          description: 'Second line of the address that specifies the apartment, suite, or space number (or any other designation not literally part of the physical address)'
+        addressLine3:
+          type: string
+          description: Third line of the address that specifies the international or business addresses that do not fit on addressLine2
+        addressLine4:
+          type: string
+          description: 'Fourth line of the address, if any'
+        addressLine5:
+          type: string
+          description: 'Fifth line of the address, if any'
+        city:
+          type: string
+          description: City or town of the business address
+        region:
+          type: string
+          description: 'State, province, or territory of the business address'
+        country:
+          $ref: '#/components/schemas/_countryTypes'
+        postalCode:
+          type: string
+          description: 'Series of letters, digits, or both, included in a postal address for the purpose of sorting mail'
+        premiseNumber:
+          type: string
+          description: House or building number of the business address
+        addressType:
+          $ref: '#/components/schemas/_addressTypes'
+    _businessAddress:
+      description: Address of the business location
+      type: object
+      properties:
+        businessAddressLine1:
+          type: string
+          description: 'First line of the business address that specifies street number, street name, and building name'
+        businessAddressLine2:
+          type: string
+          description: 'Second line of the business address that specifies the apartment, suite, or space number (or any other designation not literally part of the physical address)'
+        businessAddressLine3:
+          type: string
+          description: Third line of the business address that specifies the international or business addresses that do not fit on businessAddressLine3
+        businessAddressLine4:
+          type: string
+          description: fourth line of the business address street address
+        businessAddressLine5:
+          type: string
+          description: Fifth line of the business address street address
+        businessCity:
+          type: string
+          description: City the business is registered
+        businessRegion:
+          type: string
+          description: 'State, province, or region the business is registered'
+        businessCountry:
+          $ref: '#/components/schemas/_countryTypes'
+        businessPostalCode:
+          type: string
+          description: Postal code for the business address
+        businessPremiseNumber:
+          type: string
+          description: House number for the business address
+      title: ''
+      x-examples: {}
+    _monetaryFormatted:
+      description: 'Object representing monies, including currency, decimal, and formatted amounts'
+      allOf:
+        - type: object
+          properties:
+            formattedAmount:
+              type: string
+              description: Formatted monetary amount
+              example: '$4.32 USD (USD, en-US), 0,00 € EUR (EUR, fr-FR)'
+        - $ref: '#/components/schemas/_monetaryRequired'
+    transferBase:
+      description: Base class for the transfer
+      allOf:
+        - $ref: '#/components/schemas/_sourceDestinationToken'
+        - $ref: '#/components/schemas/_notes'
+        - $ref: '#/components/schemas/_memo'
+    _paymentPurposeTypes:
+      description: Used to identify the purpose of a payment and impacts reporting and calculated taxable earnings (if utilizing tax services)
+      enum:
+        - OTHER
+        - TAXABLE
+        - INCOME
+        - BONUS
+        - EXPENSE
+        - NON_TAXABLE
+      type: string
+    paymentBase:
+      description: Base class for the payment
+      allOf:
+        - $ref: '#/components/schemas/_monetaryRequired'
+        - $ref: '#/components/schemas/transferBase'
+        - $ref: '#/components/schemas/_paymentPurpose'
+        - $ref: '#/components/schemas/_sourceToken'
+        - $ref: '#/components/schemas/_clientPaymentId'
+        - $ref: '#/components/schemas/_autoAcceptQuote'
+    transferBaseExt:
+      description: Base extension for the transfer
+      allOf:
+        - $ref: '#/components/schemas/transferBase'
+        - $ref: '#/components/schemas/_destinationMonetaryRequired'
+        - $ref: '#/components/schemas/_clientTransferId'
+        - $ref: '#/components/schemas/_token'
+    _destinationMonetaryRequired:
+      description: Monetary instruments required for the destination
+      title: ''
+      x-examples: {}
+      type: object
+      properties:
+        destinationAmount:
+          type: number
+          format: double
+          description: Amount transferred to the destination
+        destinationCurrency:
+          $ref: '#/components/schemas/_currencyTypes'
+    _monetaryRequired:
+      description: Monetary requirements for the transfer
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+          example: 5
+          description: 'Amount of the transfer in the specified currency.'
+        currency:
+          $ref: '#/components/schemas/_currencyTypes'
+      required:
+        - amount
+        - currency
+      x-examples: {}
+    balance:
+      description: Account monetary balance
+      allOf:
+        - $ref: '#/components/schemas/_monetaryFormatted'
+        - $ref: '#/components/schemas/_token'
+      title: ''
+    _addressTypes:
+      description: 'Classifies the address type (<i>Home</i>, <i>Business</i>, <i>Billing</i>, <i>Shipping</i>)'
+      enum:
+        - RESIDENTIAL
+        - BUSINESS
+        - MAILING
+      type: string
+      x-examples: {}
+    _userTypes:
+      description: Account holder's profile type
+      enum:
+        - INDIVIDUAL
+        - BUSINESS
+      type: string
+    _userStatusTypes:
+      description: Current status of the user
+      enum:
+        - ACTIVATED
+        - PRE_ACTIVATED
+        - PENDING_EMAIL_VERIFICATION
+        - PENDING_KYC
+      type: string
+    _languageTypes:
+      type: string
+      enum:
+        - en-US
+        - en-GB
+        - fr-CA
+        - fr-FR
+        - es-MX
+        - es-ES
+        - pt-BR
+        - pt-PT
+        - de-DE
+        - it-IT
+        - ja-JP
+        - zh-CN
+        - zh-TW
+      description: Language type in IETF's BCP 47 format
+    _genderTypes:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
+        - NOT_SPECIFIED
+      description: Gender as a user identifies
+      x-examples: {}
+    _businessTypes:
+      description: Type of business (<i>Corporation</i> or <i>Partnership</i>)
+      enum:
+        - CORPORATION
+        - PARTNERSHIP_DBA
+      type: string
+      title: ''
+      x-examples: {}
+    _fxObject:
+      allOf:
+        - $ref: '#/components/schemas/_destinationMonetaryRequired'
+        - $ref: '#/components/schemas/_sourceMonetaryRequired'
+        - $ref: '#/components/schemas/_rate'
+      x-examples: {}
+      description: Currency conversion object details
+    userBase:
+      description: Object for the established group of users
+      allOf:
+        - $ref: '#/components/schemas/_userName'
+        - $ref: '#/components/schemas/_dob'
+        - $ref: '#/components/schemas/_businessInformation'
+        - $ref: '#/components/schemas/_userKycInformation'
+        - $ref: '#/components/schemas/_phoneNumbers'
+        - $ref: '#/components/schemas/_address'
+        - $ref: '#/components/schemas/_emailAddress'
+        - $ref: '#/components/schemas/_userEmployerId'
+        - $ref: '#/components/schemas/_gender'
+        - $ref: '#/components/schemas/_userType'
+        - $ref: '#/components/schemas/_programUserId'
+        - $ref: '#/components/schemas/_language'
+        - $ref: '#/components/schemas/_countryNationalityInformation'
+        - $ref: '#/components/schemas/_occupation'
+        - $ref: '#/components/schemas/_taxResidentStatus'
+        - $ref: '#/components/schemas/_currency'
+      x-examples:
+        example-1:
+          firstName: string
+          lastName: string
+          dateOfBirth: '1977-12-14'
+          businessName: string
+          businessOperatingName: string
+          businessRegistrationId: string
+          businessRegistrationRegion: string
+          businessRegistrationCountry: AD
+          businessContactRole: OWNER
+          businessAddressLine1: string
+          businessAddressLine2: string
+          businessAddressLine3: string
+          businessAddressLine4: string
+          businessAddressLine5: string
+          businessCity: string
+          businessRegion: string
+          businessCountry: AD
+          businessPostalCode: string
+          businessPremiseNumber: string
+          businessType: CORPORATION
+          driverLicenseId: string
+          passportId: string
+          governmentIdType: PASSPORT
+          governmentId: string
+          phoneNumber: string
+          mobileNumber: string
+          phoneNumberCountry: AD
+          mobileNumberCountry: AD
+          addressLine1: string
+          addressLine2: string
+          addressLine3: string
+          addressLine4: string
+          addressLine5: string
+          city: string
+          region: string
+          country: AD
+          postalCode: string
+          premiseNumber: string
+          addressType: RESIDENTIAL
+          email: string
+          employerId: string
+          gender: MALE
+          userType: INDIVIDUAL
+          programUserId: string
+          language: en-US
+          countryOfBirth: AD
+          countryOfNationality: AD
+          occupation: INDEPENDENT_BUSINESS_OWNER
+          taxResidentStatus: 'YES'
+          currency: USD
+    user:
+      description: Object for user
+      allOf:
+        - $ref: '#/components/schemas/userBase'
+        - $ref: '#/components/schemas/_token'
+        - $ref: '#/components/schemas/_userStatus'
+        - $ref: '#/components/schemas/_createdOn'
+      title: ''
+      x-examples:
+        example-1:
+          firstName: string
+          lastName: string
+          dateOfBirth: '1977-12-14'
+          businessName: string
+          businessOperatingName: string
+          businessRegistrationId: string
+          businessRegistrationRegion: string
+          businessRegistrationCountry: AD
+          businessContactRole: OWNER
+          businessAddressLine1: string
+          businessAddressLine2: string
+          businessAddressLine3: string
+          businessAddressLine4: string
+          businessAddressLine5: string
+          businessCity: string
+          businessRegion: string
+          businessCountry: AD
+          businessPostalCode: string
+          businessPremiseNumber: string
+          businessType: CORPORATION
+          driverLicenseId: string
+          passportId: string
+          governmentIdType: PASSPORT
+          governmentId: string
+          phoneNumber: string
+          mobileNumber: string
+          phoneNumberCountry: AD
+          mobileNumberCountry: AD
+          addressLine1: string
+          addressLine2: string
+          addressLine3: string
+          addressLine4: string
+          addressLine5: string
+          city: string
+          region: string
+          country: AD
+          postalCode: string
+          premiseNumber: string
+          addressType: RESIDENTIAL
+          email: string
+          employerId: string
+          gender: MALE
+          userType: INDIVIDUAL
+          programUserId: string
+          language: en-US
+          countryOfBirth: AD
+          countryOfNationality: AD
+          occupation: INDEPENDENT_BUSINESS_OWNER
+          taxResidentStatus: 'YES'
+          currency: USD
+          token: string
+          status: ACTIVATED
+          createdOn: '2020-02-21T22:00:00Z'
+    user-Request:
+      description: Request for a user
+      allOf:
+        - $ref: '#/components/schemas/userBase'
+    user-Response:
+      description: Response from a user request
+      allOf:
+        - $ref: '#/components/schemas/user'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    receiptBase:
+      description: Base for the receipt
+      allOf:
+        - $ref: '#/components/schemas/_monetaryFormatted'
+        - $ref: '#/components/schemas/_sourceDestinationToken'
+        - $ref: '#/components/schemas/_createdOn'
+        - $ref: '#/components/schemas/_token'
+        - $ref: '#/components/schemas/_transferStatus'
+      title: ''
+    receiptCollection-Response:
+      description: Response from a Receipt Collection request
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/receiptBase'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    balanceCollection-Response:
+      description: Response from a Balance Collection request
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/balance'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    userCollection-Response:
+      description: Response from a User Collection request
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/user-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    payment-Request:
+      description: Payment request
+      allOf:
+        - $ref: '#/components/schemas/paymentBase'
+        - $ref: '#/components/schemas/_notBeforeOrAfter'
+    payment:
+      description: Response from a Transfer request
+      allOf:
+        - $ref: '#/components/schemas/paymentBase'
+        - $ref: '#/components/schemas/_expiration'
+        - $ref: '#/components/schemas/_notBeforeOrAfter'
+        - $ref: '#/components/schemas/_transferStatus'
+      title: ''
+    paymentsCollection-Response:
+      description: Response from a Payment collection request
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/payment-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    payment-Response:
+      description: Response from a Payment request
+      allOf:
+        - $ref: '#/components/schemas/payment'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    transferCollection-Response:
+      description: Response from a Transfer request
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/transfer-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    _transferTypes:
+      type: string
+      enum:
+        - PAPER_CHECK
+        - BANK_TRANSFER
+        - PAYMENT
+        - SPEND_BACK
+      title: ''
+      description: Transfer type
+    _shippingMethodTypes:
+      type: string
+      enum:
+        - STANDARD
+        - EXPEDITED
+      title: ''
+      description: Shipping method type for a pre-paid card or paper check
+    _userName:
+      type: object
+      title: ''
+      properties:
+        firstName:
+          type: string
+          description: User's first name. <i>Required</i> if the user is registered as an individual.
+        lastName:
+          type: string
+          description: User's last name. <i>Required</i> if the user is registered as an individual.
+    _dob:
+      type: object
+      title: ''
+      properties:
+        dateOfBirth:
+          type: string
+          description: User's date of birth
+          format: date
+          example: '1977-12-14'
+      x-examples: {}
+    _businessInformation:
+      allOf:
+        - type: object
+          properties:
+            businessName:
+              type: string
+              description: Legal name for the business
+            businessOperatingName:
+              type: string
+              description: Name under which the business operates
+            businessRegistrationId:
+              type: string
+              description: Registration number or ID assigned by a government body
+            businessRegistrationRegion:
+              type: string
+              description: 'State, province, or territory where the business is registered'
+            businessRegistrationCountry:
+              $ref: '#/components/schemas/_countryTypes'
+            businessContactRole:
+              type: string
+              description: Role of the user within the business
+              enum:
+                - OWNER
+                - MANAGER
+                - PARTNER
+                - OTHER
+        - $ref: '#/components/schemas/_businessAddress'
+        - $ref: '#/components/schemas/_businessType'
+      x-examples: {}
+      description: 'Physical address of the business and other information, such as <i>Operating Name</i>, <i>Registration ID</i>, etc.'
+    _userKycInformation:
+      type: object
+      title: ''
+      properties:
+        driverLicenseId:
+          type: string
+          description: User's driver's license number
+        passportId:
+          type: string
+          description: User's passport number
+        governmentIdType:
+          type: string
+          description: User's government ID type
+          enum:
+            - PASSPORT
+            - NATIONAL_ID_CARD
+            - CURP
+        governmentId:
+          type: string
+          description: 'User''s government ID number, such as a <i>SSN</i>, <i>EIN</i>, or <i>SIN</i>'
+    _phoneNumbers:
+      type: object
+      title: ''
+      properties:
+        phoneNumber:
+          type: string
+          description: The E.164 formatted primary phone number. This can be the same as the mobile number.
+        mobileNumber:
+          type: string
+          description: 'The E.164 formatted mobile phone number, required by most financial institutions for account creation, verification, or PSD2 (3DS). Mobile numbers must be unique to a user within a tenant and cannot be shared.'
+        phoneNumberCountry:
+          $ref: '#/components/schemas/_countryTypes'
+        mobileNumberCountry:
+          $ref: '#/components/schemas/_countryTypes'
+      required:
+        - mobileNumber
+        - mobileNumberCountry
+        - phoneNumber
+        - phoneNumberCountry
+    _countryNationalityInformation:
+      allOf:
+        - properties:
+            countryOfBirth:
+              $ref: '#/components/schemas/_countryTypes'
+            countryOfNationality:
+              $ref: '#/components/schemas/_countryTypes'
+      type: object
+    _emailAddress:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email address for the user account
+          maxLength: 150
+      description: Contact email address for the user account
+      x-examples: {}
+    _userEmployerId:
+      type: object
+      properties:
+        employerId:
+          type: string
+          description: User's employer identifier
+      description: User's employer identifier, generally used for tax purposes.
+    _gender:
+      type: object
+      description: Gender as the user identifies
+      x-examples: {}
+      properties:
+        gender:
+          $ref: '#/components/schemas/_genderTypes'
+    _language:
+      type: object
+      title: ''
+      description: Preferred language for the user's account. <i>Defaults to English</i>
+      properties:
+        language:
+          $ref: '#/components/schemas/_languageTypes'
+    _userType:
+      type: object
+      title: ''
+      description: User's profile type
+      properties:
+        userType:
+          $ref: '#/components/schemas/_userTypes'
+    _programUserId:
+      type: object
+      title: ''
+      properties:
+        programUserId:
+          type: string
+          description: Program identifier for the user
+      description: Program identifier for the user
+    _sourceDestinationToken:
+      allOf:
+        - $ref: '#/components/schemas/_sourceToken'
+        - $ref: '#/components/schemas/_destinationToken'
+      title: ''
+      description: Unique identifier representing the source of the funds.
+    _token:
+      type: object
+      title: ''
+      properties:
+        token:
+          type: string
+          description: Token representing the resource, prefixed with <i>user-</i>, <i>dest-</i>, <i>xfer-</i>, <i>acct-</i>, <i>pmnt-</i>, or <i>docu-</i>.
+      description: Token representing the resource, prefixed with <i>user-</i>, <i>dest-</i>, <i>xfer-</i>, <i>acct-</i>, <i>pmnt-</i>, or <i>docu-</i>.
+    _clientTransferId:
+      type: object
+      properties:
+        clientTransferId:
+          type: string
+          description: Unique value provided by the client for the transfer.
+      title: ''
+      x-examples: {}
+      description: Unique value provided by the client for the transfer, utilized for reference and deduplication.
+    _notes:
+      type: object
+      title: ''
+      properties:
+        notes:
+          type: string
+          description: Optional comments visible to the user.
+      description: Optional comments visible to the user
+    _memo:
+      type: object
+      title: ''
+      properties:
+        memo:
+          type: string
+          description: Optional internal memo not visible to the user.
+      description: Optional internal memo not visible to the user.
+    _createdOn:
+      type: object
+      title: ''
+      properties:
+        createdOn:
+          type: string
+          description: Time at which the object was created.
+          format: date-time
+          example: '2020-02-21T22:00:00Z'
+      x-examples: {}
+      description: Time at which the object was created.
+    _transferStatus:
+      type: object
+      title: ''
+      description: Current status of the transfer.
+      properties:
+        status:
+          $ref: '#/components/schemas/_transferStatusTypes'
+    _userStatus:
+      type: object
+      title: ''
+      description: Current status of the user.
+      properties:
+        status:
+          $ref: '#/components/schemas/_userStatusTypes'
+    _paymentPurpose:
+      type: object
+      title: ''
+      description: Purpose for the payment being made.
+      properties:
+        purpose:
+          $ref: '#/components/schemas/_paymentPurposeTypes'
+    _sourceToken:
+      type: object
+      title: ''
+      description: Unique identifier representing the source of funds.
+      properties:
+        sourceToken:
+          type: string
+          description: Unique identifier representing the source of funds.
+    _destinationToken:
+      type: object
+      title: ''
+      description: Unique identifier representing the destination of funds.
+      properties:
+        destinationToken:
+          type: string
+          description: Unique identifier representing the destination of funds.
+      x-examples: {}
+    _clientPaymentId:
+      type: object
+      properties:
+        clientPaymentId:
+          type: string
+          description: Unique value provided by the client for the payment.
+      title: ''
+      x-examples: {}
+      description: Unique value provided by the client for the payment, utilized for reference and de-duplication.
+    _autoAcceptQuote:
+      type: object
+      title: ''
+      description: Determines whether the quote is automatically accepted or if a POST utilizing the token for the quote is required.
+      x-examples: {}
+      properties:
+        autoAcceptQuote:
+          type: boolean
+          description: Determines whether the quote is automatically accepted or if a POST utilizing the token for the quote is required.
+    _rate:
+      type: object
+      title: ''
+      description: Exchange rate
+      properties:
+        rate:
+          type: number
+          maximum: 1
+          minimum: 0
+          example: 0.85
+          format: double
+          description: Exchange rate
+    _fx:
+      type: object
+      properties:
+        fx:
+          $ref: '#/components/schemas/_fxObject'
+      title: ''
+      x-examples: {}
+      description: The details of the country's foreign exchange currency.
+    paperCheckBase:
+      allOf:
+        - $ref: '#/components/schemas/_transferType'
+        - $ref: '#/components/schemas/_monetaryRequired'
+        - $ref: '#/components/schemas/_address'
+        - $ref: '#/components/schemas/_bankAccountOwnership'
+        - $ref: '#/components/schemas/_shippingMethod'
+      title: ''
+    _transferType:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/_transferTypes'
+      title: ''
+      description: Type of transfer method
+    _bankAccountOwnershipTypes:
+      type: string
+      enum:
+        - PERSONAL
+        - BUSINESS
+      description: Account ownership types
+      title: ''
+      x-examples: {}
+    _bankAccountOwnership:
+      type: object
+      properties:
+        bankAccountOwnershipType:
+          $ref: '#/components/schemas/_bankAccountOwnershipTypes'
+      title: ''
+      description: Account ownership type
+      x-examples: {}
+    _shippingMethod:
+      type: object
+      title: ''
+      description: Shipping method desired
+      x-examples: {}
+      properties:
+        shippingMethod:
+          $ref: '#/components/schemas/_shippingMethodTypes'
+    paperCheck:
+      allOf:
+        - $ref: '#/components/schemas/_token'
+        - $ref: '#/components/schemas/_createdOn'
+        - $ref: '#/components/schemas/paperCheckBase'
+      title: ''
+      description: Details of the paper check
+    paperCheck-Request:
+      allOf:
+        - $ref: '#/components/schemas/paperCheckBase'
+      description: Request for a paper check
+    paperCheck-Response:
+      allOf:
+        - $ref: '#/components/schemas/paperCheck'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+      description: Response to a paper check request
+    paperCheckCollection-Response:
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/paperCheck'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+      description: Response to a paper check collection request
+    _bankAccountFields:
+      allOf:
+        - $ref: '#/components/schemas/_bankAccountOwnership'
+        - $ref: '#/components/schemas/_bankAccountType'
+        - type: object
+          properties:
+            fields:
+              type: array
+              items:
+                $ref: '#/components/schemas/_keyValuePairBankFieldTypesString'
+            bankCurrency:
+              $ref: '#/components/schemas/_currencyTypes'
+            bankCountry:
+              $ref: '#/components/schemas/_countryTypes'
+            description:
+              type: string
+              description: User-supplied description of the bank account for reference
+      description: Classifies account field objects
+      title: ''
+    _bankAccountTypes:
+      type: string
+      enum:
+        - CHECKING
+        - SAVINGS
+        - MONEY_MARKET
+      description: 'Financial purpose of the bank account (<i>Savings</i>, <i>Investment</i>)'
+      title: ''
+    _bankAccountType:
+      type: object
+      title: ''
+      properties:
+        type:
+          $ref: '#/components/schemas/_bankAccountTypes'
+      description: 'Type of bank account (<i>Savings</i>, <i>Investment</i>)'
+      x-examples: {}
+    bankAccountBase:
+      type: string
+      allOf:
+        - $ref: '#/components/schemas/_bankAccountFields'
+      title: ''
+      description: Base class applied to the account
+    _bankAccountStatusTypes:
+      type: string
+      enum:
+        - DELETED
+        - ACTIVE
+        - PENDING_VERIFICATION
+      description: Current verification status type of the bank account
+      title: ''
+      x-examples: {}
+    bankAccount:
+      allOf:
+        - $ref: '#/components/schemas/_token'
+        - $ref: '#/components/schemas/_bankAccountStatus'
+        - $ref: '#/components/schemas/_createdOn'
+        - $ref: '#/components/schemas/_bankAccountFields'
+      title: ''
+      description: Unique identifier for the bank account
+    _bankAccountStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/_bankAccountStatusTypes'
+      title: ''
+      description: 'Verification status of the bank account (<i>Verified</i>, <i>Disabled</i>)'
+      x-examples: {}
+    bankAccount-Request:
+      allOf:
+        - $ref: '#/components/schemas/bankAccountBase'
+      title: ''
+      description: Request for the bank account
+    bankAccount-Response:
+      allOf:
+        - $ref: '#/components/schemas/bankAccount'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+      description: Response to the bank account request
+    bankAccountCollection-Response:
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/bankAccount-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+      description: Collection response to the bank account request
+    _prepaidCardPackage:
+      type: object
+      title: ''
+      properties:
+        cardPackage:
+          type: string
+          description: 'Package for the card being displayed (<i>Virtual<,i>) or <i>Produced (physical)</i>'
+      description: 'Package for the card being displayed (<i>Virtual<,i>) or <i>Produced (physical)</i>, including artwork, packaging, and delivery method'
+    prepaidCardBase:
+      allOf:
+        - $ref: '#/components/schemas/_prepaidCardPackage'
+        - type: object
+          properties:
+            programToken:
+              type: string
+              description: Token representing a program
+              pattern: '''^prog-[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$'''
+          required:
+            - programToken
+      title: ''
+      description: Base class applied to the prepaid card
+    _prepaidCardStatus:
+      type: object
+      title: ''
+      description: Current status of the prepaid card
+      properties:
+        status:
+          type: string
+          enum:
+            - QUEUED
+            - LOST_STOLEN_DAMAGED
+            - ACTIVATED
+            - PENDING_ACTIVATION
+            - SUSPENDED
+            - COMPLIANCE_HOLD
+            - KYC_HOLD
+            - LOCKED
+          description: Current status of the prepaid card
+    _tokenTypes:
+      type: string
+      enum:
+        - BANK_ACCOUNT
+        - TRANSFER
+        - PAYMENT
+        - SPEND_BACK
+        - PREPAID_CARD
+        - USER
+        - DOCUMENT
+        - ACCOUNT
+      description: Types of resources represented by a token
+    _tokenType:
+      type: object
+      properties:
+        tokenType:
+          $ref: '#/components/schemas/_tokenTypes'
+    prepaidCardBaseExt:
+      allOf:
+        - $ref: '#/components/schemas/_token'
+        - $ref: '#/components/schemas/_prepaidCardStatus'
+      title: ''
+      description: Base extension for the prepaid card
+    _cardNetworkTypes:
+      type: string
+      enum:
+        - VISA
+        - MASTER_CARD
+      description: Major credit card network types
+      title: ''
+      x-examples: {}
+    _cardNetwork:
+      type: object
+      properties:
+        cardNetwork:
+          $ref: '#/components/schemas/_cardNetworkTypes'
+      title: ''
+      x-examples: {}
+      description: Major credit card network
+    _prepaidCardPersonalizationTypes:
+      type: string
+      enum:
+        - PERSONALIZED
+        - NON_PERSONALIZED
+      title: ''
+      description: 'Specifies a card is <i>Personalized</i> or <i>Non-personalized</i> (i.e., issued to Preferred Customer)'
+    _prepaidCardPersonalization:
+      type: object
+      properties:
+        cardPersonalization:
+          $ref: '#/components/schemas/_prepaidCardPersonalizationTypes'
+      title: cardPersonalizationType
+      description: Type of personalization for the prepaid card
+    prepaidCard:
+      allOf:
+        - $ref: '#/components/schemas/prepaidCardBaseExt'
+        - $ref: '#/components/schemas/_createdOn'
+        - $ref: '#/components/schemas/_country'
+        - $ref: '#/components/schemas/_currency'
+        - $ref: '#/components/schemas/_prepaidCardPersonalization'
+        - $ref: '#/components/schemas/_prepaidCardPackage'
+        - $ref: '#/components/schemas/_cardNetwork'
+        - $ref: '#/components/schemas/_expiration'
+        - $ref: '#/components/schemas/_cardMaskedPan'
+        - $ref: '#/components/schemas/_cvv'
+    _currency:
+      type: object
+      properties:
+        currency:
+          $ref: '#/components/schemas/_currencyTypes'
+      title: ''
+      description: Currency code used for the object
+      x-examples: {}
+    _currencyTypes:
+      description: Currency code type for the object
+      type: string
+      enum:
+        - USD
+        - CAD
+        - MXN
+        - AUD
+        - HKD
+        - NZD
+        - EUR
+        - GBP
+      x-examples: {}
+    _country:
+      type: object
+      title: ''
+      properties:
+        country:
+          $ref: '#/components/schemas/_countryTypes'
+      required:
+        - country
+      x-examples: {}
+      description: Two-digit country code for the object
+    _countryTypes:
+      description: Two-digit country code types
+      enum:
+        - AD
+        - AE
+        - AF
+        - AG
+        - AI
+        - AL
+        - AM
+        - AN
+        - AO
+        - AQ
+        - AR
+        - AS
+        - AT
+        - AU
+        - AW
+        - AX
+        - AZ
+        - BA
+        - BB
+        - BD
+        - BE
+        - BF
+        - BG
+        - BH
+        - BI
+        - BJ
+        - BL
+        - BM
+        - BN
+        - BO
+        - BQ
+        - BR
+        - BS
+        - BT
+        - BV
+        - BW
+        - BY
+        - BZ
+        - CA
+        - CC
+        - CD
+        - CF
+        - CG
+        - CH
+        - CI
+        - CK
+        - CL
+        - CM
+        - CN
+        - CO
+        - CR
+        - CU
+        - CV
+        - CW
+        - CX
+        - CY
+        - CZ
+        - DE
+        - DJ
+        - DK
+        - DM
+        - DO
+        - DZ
+        - EC
+        - EE
+        - EG
+        - EH
+        - ER
+        - ES
+        - ET
+        - FI
+        - FJ
+        - FK
+        - FM
+        - FO
+        - FR
+        - GA
+        - GB
+        - GD
+        - GE
+        - GF
+        - GG
+        - GH
+        - GI
+        - GL
+        - GM
+        - GN
+        - GP
+        - GQ
+        - GR
+        - GS
+        - GT
+        - GU
+        - GW
+        - GY
+        - HK
+        - HM
+        - HN
+        - HR
+        - HT
+        - HU
+        - ID
+        - IE
+        - IL
+        - IM
+        - IN
+        - IO
+        - IQ
+        - IR
+        - IS
+        - IT
+        - JE
+        - JM
+        - JO
+        - JP
+        - KE
+        - KG
+        - KH
+        - KI
+        - KM
+        - KN
+        - KP
+        - KR
+        - KW
+        - KY
+        - KZ
+        - LA
+        - LB
+        - LC
+        - LI
+        - LK
+        - LR
+        - LS
+        - LT
+        - LU
+        - LV
+        - LY
+        - MA
+        - MC
+        - MD
+        - ME
+        - MF
+        - MG
+        - MH
+        - MK
+        - ML
+        - MM
+        - MN
+        - MO
+        - MP
+        - MQ
+        - MR
+        - MS
+        - MT
+        - MU
+        - MV
+        - MW
+        - MX
+        - MY
+        - MZ
+        - NA
+        - NC
+        - NE
+        - NF
+        - NG
+        - NI
+        - NL
+        - 'NO'
+        - NP
+        - NR
+        - NU
+        - NZ
+        - OM
+        - PA
+        - PE
+        - PF
+        - PG
+        - PH
+        - PK
+        - PL
+        - PM
+        - PN
+        - PR
+        - PS
+        - PT
+        - PW
+        - PY
+        - QA
+        - RE
+        - RO
+        - RS
+        - RU
+        - RW
+        - SA
+        - SB
+        - SC
+        - SD
+        - SE
+        - SG
+        - SH
+        - SI
+        - SJ
+        - SK
+        - SL
+        - SM
+        - SN
+        - SO
+        - SR
+        - SS
+        - ST
+        - SV
+        - SX
+        - SY
+        - SZ
+        - TC
+        - TD
+        - TF
+        - TG
+        - TH
+        - TJ
+        - TK
+        - TL
+        - TM
+        - TN
+        - TO
+        - TR
+        - TT
+        - TV
+        - TW
+        - TZ
+        - UA
+        - UG
+        - UM
+        - US
+        - UY
+        - UZ
+        - VA
+        - VC
+        - VE
+        - VG
+        - VI
+        - VN
+        - VU
+        - WF
+        - WS
+        - YE
+        - YT
+        - ZA
+        - ZM
+        - ZW
+      type: string
+      x-examples: {}
+    prepaidCard-RequestResponse:
+      allOf:
+        - $ref: '#/components/schemas/prepaidCardBaseExt'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    prepaidCard-Response:
+      allOf:
+        - $ref: '#/components/schemas/prepaidCard'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    prepaidCardCollection-Response:
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/prepaidCard-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    _cardMaskedPan:
+      type: object
+      title: ''
+      properties:
+        cardNumber:
+          type: string
+          description: Masked card number with only the first 6 and last 4 digits visible
+          example: 1234 56** **** 1234
+          minLength: 19
+          maxLength: 19
+          pattern: '^\d{4} \d{2}\*{2} \*{4} \d{4}$'
+      x-examples: {}
+      description: Card number using PAN truncation
+    _prepaidCardReplacementReasonTypes:
+      type: string
+      enum:
+        - LOST
+        - STOLEN
+        - DAMAGED
+        - COMPROMISED
+        - EXPIRED
+      title: ''
+      description: 'Reason for card replacement. In certain programs, the replacement reason code impacts replacement cost and responsibility.'
+    _prepaidCardReplacementReason:
+      type: object
+      properties:
+        cardReplacementReason:
+          $ref: '#/components/schemas/_prepaidCardReplacementReasonTypes'
+      title: ''
+    prepaidCardReplacementBase:
+      allOf:
+        - $ref: '#/components/schemas/prepaidCardBase'
+        - $ref: '#/components/schemas/_prepaidCardReplacementReason'
+    prepaidCardReplacement-Request:
+      type: object
+      properties:
+        '':
+          $ref: '#/components/schemas/prepaidCardReplacementBase'
+    prepaidCardPinToken-Response:
+      allOf:
+        - $ref: '#/components/schemas/_prepaidCardPinToken'
+      title: ''
+    _prepaidCardPin:
+      type: object
+      title: ''
+      properties:
+        cardPin:
+          type: string
+          description: Card PIN for ATM and Debit usage
+    _prepaidCardPinToken:
+      type: object
+      title: ''
+      properties:
+        cardPinToken:
+          type: string
+          description: 'Token used as part of a two-leg card PIN reveal request sent directly from the client that generally involves a second piece of data, such as the CVV code on the back of the card.'
+        url:
+          type: string
+          description: Full path of the URI to perform the request action against a prepaid card that replaces the need to build the URL with query params
+      x-examples:
+        example 1:
+          cardPinToken: string
+          url: string
+    prepaidCardRevealPin-Response:
+      allOf:
+        - $ref: '#/components/schemas/_prepaidCardPin'
+    _cvv:
+      type: object
+      title: ''
+      properties:
+        cvv:
+          type: string
+          description: 'Card Verification Value (CVV) on the credit card or debit card. (3-digit number on VISA®, MasterCard® branded credit and debit cards)'
+      x-examples: {}
+      description: Three- or four-digit Card Verification Value (CVV) number displayed on the back of a credit or debit card
+    _identityVerificationProviderTypes:
+      type: string
+      enum:
+        - W2
+        - IDOLOGY
+        - BANK
+        - EQUIFAX
+        - OFAC
+        - LEXUS_NEXUS
+      title: ''
+      description: Provider types of verification that can be used for performing identity checks
+      x-examples: {}
+    _identityVerificationProviderType:
+      type: object
+      title: ''
+      properties:
+        idvProvider:
+          $ref: '#/components/schemas/_identityVerificationProviderTypes'
+      x-examples: {}
+      description: Provider type of verification that can be used for performing identity checks
+    _identityVerificationResultTypes:
+      type: string
+      enum:
+        - PASS
+        - FAIL
+        - SERVICE_OFFLINE
+        - PROCESSING
+      title: ''
+      description: 'In combination with the <i>Disposition</i> type, the <i>Result</i> type provides the results of an IDV check. A <i>Dispositioned</i> result of <i>FINAL PASS</i> represents a passing check, whereas a <i>TRANSIENT FAIL</i> is still being processed but has failed at least one phase of the check. Until the disposition is <i>FINAL</i>, a result has not been determined.'
+      x-examples: {}
+    _identityVerificationResultSubTypes:
+      type: string
+      enum:
+        - HARD
+        - SOFT
+      title: ''
+      description: 'If used by a provider, sub-results that give additional insight into the results, including whether they result was <i>Soft</i> or <i>Hard</i>. <i>Soft</i> results may have additional recourse that can be leveraged to validate a user’s identity.'
+      x-examples: {}
+    _identityVerificationDispositionTypes:
+      type: string
+      enum:
+        - TRANSIENT
+        - FINAL
+      title: ''
+      description: 'In combination with the <i>Disposition</i> type, the <i>Result</i> type provides the results of an IDV check. A <i>Dispositioned</i> result of <i>FINAL PASS</i> represents a passing check, whereas a <i>TRANSIENT FAIL</i> is still being processed but has failed at least one phase of the check. Until the disposition is <i>FINAL</i>, a result has not been determined.'
+      x-examples: {}
+    _identityVerificationResultType:
+      type: object
+      properties:
+        idvResult:
+          $ref: '#/components/schemas/_identityVerificationResultTypes'
+      title: ''
+      x-examples: {}
+      description: 'In combination with the <i>Disposition</i> type, the <i>Result</i> type provides the results of an IDV check. A <i>Dispositioned</i> result of <i>FINAL PASS</i> represents a passing check, whereas a <i>TRANSIENT FAIL</i> is still being processed but has failed at least one phase of the check. Until the disposition is <i>FINAL</i>, a result has not been determined.'
+    _identityVerificationSubResultType:
+      type: object
+      properties:
+        idvSubResult:
+          $ref: '#/components/schemas/_identityVerificationResultSubTypes'
+      title: ''
+      x-examples: {}
+      description: 'If used by a provider, sub-results that give additional insight into the results, including whether they result was <i>Soft</i> or <i>Hard</i>. <i>Soft</i> results may have additional recourse that can be leveraged to validate a user’s identity.'
+    _identityVerificationDispositionType:
+      type: object
+      properties:
+        idvDispostion:
+          $ref: '#/components/schemas/_identityVerificationDispositionTypes'
+      title: ''
+      x-examples: {}
+      description: 'In combination with the <i>Disposition</i> type, the <i>Result</i> type provides the results of an IDV check. A <i>Dispositioned</i> result of <i>FINAL PASS</i> represents a passing check, whereas a <i>TRANSIENT FAIL</i> is still being processed but has failed at least one phase of the check. Until the disposition is <i>FINAL</i>, a result has not been determined.'
+    _identityVerificationCheckTypes:
+      type: string
+      enum:
+        - DOCUMENTARY
+        - NON_DOCUMENTARY
+        - OFAC
+      title: ''
+      description: 'Types of verification used for performing identity checks (<i>documentary</i>, <i>non-documentary</i>, <i>OFAC</i>, etc.)'
+      x-examples: {}
+    _identityVerificationCheckType:
+      type: object
+      properties:
+        idvCheckType:
+          $ref: '#/components/schemas/_identityVerificationCheckTypes'
+      title: ''
+      x-examples: {}
+      description: Type of verification used for performing an identity check
+    identityVerificationBase:
+      allOf:
+        - $ref: '#/components/schemas/_identityVerificationProviderReference'
+        - $ref: '#/components/schemas/_identityVerificationResultType'
+        - $ref: '#/components/schemas/_identityVerificationSubResultType'
+        - $ref: '#/components/schemas/_identityVerificationProviderType'
+        - $ref: '#/components/schemas/_createdOn'
+        - $ref: '#/components/schemas/_identityVerificationProviderRawOutput'
+        - $ref: '#/components/schemas/_identityVerificationCheckType'
+        - $ref: '#/components/schemas/_identityVerificationDispositionType'
+        - $ref: '#/components/schemas/_token'
+      title: ''
+    _identityVerificationProviderReference:
+      type: object
+      title: ''
+      properties:
+        idvProviderReference:
+          type: string
+          description: IDV provider unique ID for the IDV check performed
+      description: Provider reference used for performing identity checks for the provider
+      x-examples: {}
+    _identityVerificationProviderRawOutput:
+      type: object
+      title: ''
+      properties:
+        raw:
+          type: string
+          description: Contains the raw (unprocessed) output from the IDV provider. Format of the raw output can vary widely and is not documented. *For reference/debugging only
+      x-examples: {}
+      description: Contains the raw (unprocessed) output from the IDV provider. Format of the raw output can vary widely and is not documented. *For reference/debugging only
+    identityVerification-Response:
+      allOf:
+        - $ref: '#/components/schemas/identityVerificationBase'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    identityVerificationCollection-Response:
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/identityVerification-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+      title: ''
+    prepaidCard-Request:
+      allOf:
+        - $ref: '#/components/schemas/prepaidCardBase'
+    prepaidCardPartialUpdate-Request:
+      allOf:
+        - $ref: '#/components/schemas/_prepaidCardStatus'
+    _keyValuePairStringString:
+      title: _keyValuePairStringString
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    _bankAccountFieldTypes:
+      type: string
+      title: _bankAccountFieldTypes
+      enum:
+        - BANK_ACH_ABA
+        - BANK_BBAN
+        - BANK_BRANCH_CODE
+        - BANK_BSB_CODE
+        - BANK_CITY
+        - BANK_CLABE
+        - BANK_CODE
+        - BANK_CURP
+        - BANK_IBAN
+        - BANK_NAME
+        - BANK_NON_SWIFT_BIC
+        - BANK_NUBAN
+        - BANK_PHONE_NUMBER
+        - BANK_POSTAL_CODE
+        - BANK_REGION
+        - BANK_RFC
+        - BANK_SORT_CODE
+        - BANK_STREET_ADDRESS
+        - BANK_SWIFT_BIC
+        - BANK_TRANSIT_CODE
+        - BENEFICIARY_ACCOUNT_NUMBER
+        - BENEFICIARY_PHONE_NUMBER
+        - BENEFICIARY_TAX_ID
+        - BENEFICIARY_NAME
+        - BANK_BRANCH_NAME
+        - BANK_PURPOSE_OF_PAYMENT_CODE
+        - BANK_VALUE_ADD_TAX
+      description: Classifies account field types
+      x-examples: {}
+    _keyValuePairBankFieldTypesString:
+      title: _keyValuePairBankFieldTypesString
+      type: object
+      description: 1...N required fields as determined by call to get requirements
+      properties:
+        key:
+          $ref: '#/components/schemas/_bankAccountFieldTypes'
+        value:
+          type: string
+          description: ''
+      required:
+        - key
+        - value
+    _keyValuePairBankCurrencyCurrencyTypes:
+      title: _keyValuePairBankCurrencyCurrencyTypes
+      type: object
+      properties:
+        key:
+          type: string
+          example: BANK_CURRENCY
+          default: BANK_CURRENCY
+        value:
+          $ref: '#/components/schemas/_currencyTypes'
+    _keyValueBankCountryCountryTypes:
+      title: _keyValueBankCountryCountryTypes
+      type: object
+      properties:
+        key:
+          type: string
+          default: BANK_COUNTRY
+          example: BANK_COUNTRY
+        value:
+          $ref: '#/components/schemas/_countryTypes'
+    _bankAccountRequiredFields:
+      title: _bankAccountRequiredFields
+      type: object
+      properties:
+        format:
+          $ref: '#/components/schemas/_bankAccountRequirementFormat'
+        requirement:
+          $ref: '#/components/schemas/_bankAccountFieldTypes'
+        description:
+          type: array
+          description: Localized requirement description for display purposes
+          items:
+            $ref: '#/components/schemas/_keyValuePairLanguageTypeString'
+        validators:
+          type: array
+          items:
+            $ref: '#/components/schemas/_bankAccountRequirementValidator'
+      description: Classifies the required account field objects
+      x-examples: {}
+    _bankAccountRequirementFormat:
+      title: _bankAccountRequirementFormat
+      type: object
+      properties:
+        example:
+          type: string
+          description: Example of a requirement generated from the validator(s)
+        legend:
+          type: array
+          items:
+            $ref: '#/components/schemas/_bankAccountRequirementFormatLegend'
+      x-examples: {}
+      description: Classifies the format of the required information for a bank account
+    _bankAccountRequirementFormatLegend:
+      title: _bankAccountRequirementFormatLegend
+      type: object
+      properties:
+        key:
+          type: string
+        descriptions:
+          type: array
+          description: Localized requirement description for display purposes
+          items:
+            $ref: '#/components/schemas/_keyValuePairLanguageTypeString'
+      x-examples: {}
+      description: Classifies the legend format of the required information for a bank account
+    _keyValuePairLanguageTypeString:
+      title: _keyValuePairLanguageTypeString
+      type: object
+      properties:
+        language:
+          $ref: '#/components/schemas/_languageTypes'
+        translation:
+          type: string
+          description: Translated string in the specified language
+      description: Localized requirement description for display purposes
+    _validatorTypes:
+      type: string
+      title: _validatorTypes
+      enum:
+        - REGEX
+        - LENGTH
+    _bankAccountRequirementValidator:
+      title: _bankAccountRequirementValidator
+      type: object
+      properties:
+        validatorType:
+          $ref: '#/components/schemas/_validatorTypes'
+        expression:
+          type: string
+          description: Validation regular expression
+      required:
+        - expression
+      x-examples: {}
+      description: Specifies the validator type for the required bank account information
+    _bankAccountRequirement:
+      title: _bankAccountRequirement
+      type: object
+      x-examples: {}
+      properties:
+        bankCountry:
+          $ref: '#/components/schemas/_countryTypes'
+        bankCurrency:
+          $ref: '#/components/schemas/_currencyTypes'
+        sourceCountry:
+          $ref: '#/components/schemas/_countryTypes'
+        sourceCurrency:
+          $ref: '#/components/schemas/_currencyTypes'
+        requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/_bankAccountRequiredFields'
+        quote:
+          $ref: '#/components/schemas/_monetaryFormatted'
+      required:
+        - bankCountry
+        - bankCurrency
+      description: Classifies the format of the required information for a bank account
+    bankAccountRequirement-Response:
+      title: bankAccountRequirement-Response
+      allOf:
+        - $ref: '#/components/schemas/_bankAccountRequirement'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    bankAccountRequirementCollection-Response:
+      title: bankAccountRequirementCollection-Response
+      allOf:
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/bankAccountRequirement-Response'
+        - $ref: '#/components/schemas/_haetosSelfRef'
+    _occupationTypes:
+      type: string
+      title: _occupationTypes
+      description: Type of occupation for the user
+      enum:
+        - INDEPENDENT_BUSINESS_OWNER
+        - SCIENCE
+        - TECHNOLOGY
+        - ENGINEERING
+        - MATH
+        - HEALTHCARE
+        - SOCIAL_SERVICES
+        - MEDIA
+        - FINANCE
+        - GOVERNMENT
+        - MANUFACTURING
+        - LAW
+        - HOSPITALITY_AND_TOURISM
+        - ARTS
+        - DESIGN
+        - OFFICE_AND_ADMIN_SUPPORT
+        - EDUCATION
+    _occupation:
+      type: object
+      properties:
+        occupation:
+          $ref: '#/components/schemas/_occupationTypes'
+    _taxResidentStatusTypes:
+      type: string
+      title: _taxResidentStatusTypes
+      description: Tax resident status type of a country
+      enum:
+        - 'YES'
+        - 'NO'
+        - PREFER_NOT_TO_ANSWER
+    _taxResidentStatus:
+      type: object
+      properties:
+        taxResidentStatus:
+          $ref: '#/components/schemas/_taxResidentStatusTypes'
+    webhook-Subscription:
+      title: webhook-Subscription
+      type: object
+      description: Webhook subscription object
+      properties:
+        url:
+          type: string
+        namespace:
+          $ref: '#/components/schemas/_namespace'
+    webhook-Subscription-Request:
+      allOf:
+        - $ref: '#/components/schemas/webhook-Subscription'
+    webhook-Subscription-Response:
+      description: Webhook Subscription response
+      allOf:
+        - $ref: '#/components/schemas/_haetosSelfRef'
+        - $ref: '#/components/schemas/webhook-Subscription'
+        - type: object
+          properties:
+            token:
+              type: string
+              description: Token for the webhook subscription
+            created:
+              type: string
+              description: Time stamp for the date the webhook subscription was created
+            lastUpdated:
+              type: string
+              description: Time stamp for the date the webhook subscription was updated
+    webhookSubscriptionCollection-Response:
+      title: webhookCollection-Response
+      allOf:
+        - $ref: '#/components/schemas/_haetosSelfRef'
+        - type: object
+          properties:
+            payload:
+              type: array
+              items:
+                $ref: '#/components/schemas/webhook-Subscription-Response'
+      description: Webhook Subscription collection response
+    _namespace:
+      type: string
+      title: _namespace
+      description: Namespace used to identify and refer to the object
+      enum:
+        - BANKACCOUNTS.UPDATED.STATUS.APPROVED
+        - PREPAIDCARDS.CREATED
+        - TRANSFERS.ACCEPTED
+    prepaidCardData-Response:
+      description: Response to the prepaid card data request
+      type: object
+      properties:
+        cardImage:
+          type: string
+        cardNumber:
+          type: number
+        cvvNumber:
+          type: string
+        expiration:
+          type: string
+        nameOnCard:
+          type: string
+        side:
+          type: string
+        token:
+          type: string
+    _prepaidCardDataToken:
+      description: Token assigned to the prepaid card
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+        url:
+          type: string
+          description: Full path of the URI to perform the request action against a prepaid card that replaces the need to build the URL with query params
+      required:
+        - token
+    prepaidCardDataToken-Response:
+      title: prepaidCardDataToken-Response
+      type: object
+      properties:
+        token:
+          $ref: '#/components/schemas/_prepaidCardDataToken'
+    _businessType:
+      title: _businessType
+      type: object
+      properties:
+        businessType:
+          $ref: '#/components/schemas/_businessTypes'
+  securitySchemes:
+    client Credential Grant Flow:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://identity.mypayquicker.build/core/connect/token'
+          refreshUrl: ''
+          scopes:
+            'https://www.payquicker.com/scopes/daybreak/access/base ': ''
+            'https://www.payquicker.com/scopes/daybreak/access/partner': ''
+            'https://www.payquicker.com/scopes/daybreak/access/public': ''
+            read-only: 'Can be accessed, but not modified'
+            write: Can be accessed and edited
+  headers:
+    X-MyPayQuicker-Version:
+      schema:
+        type: string
+      example: 2020.02.24
+      description: Date-based API Version specified in the header <i>required</i> on all calls. 
+      required: true
+    X-Paging-PageNo:
+      schema:
+        type: integer
+      description: Page number of current page
+      required: true
+    X-Paging-PageSize:
+      schema:
+        type: integer
+      description: Number of items to be displayed per page
+      required: true
+    X-Paging-PageCount:
+      schema:
+        type: integer
+      description: Total number of pages in a dataset
+      required: true
+    X-Paging-TotalRecordCount:
+      schema:
+        type: integer
+      description: Total number of records in a dataset
+      required: true
+    X-TimeZone:
+      schema:
+        type: string
+      description: Timezone (IANA standard) of the client to be used on server side while processing datetime index data values
+      required: true
+      examples:
+        newyork:
+          value: America/New_York
+        gmt:
+          value: GMT
+  parameters:
+    pageParam:
+      name: page
+      description: Page number of specific page to return
+      schema:
+        minimum: 1
+        type: integer
+      in: query
+      required: false
+    limitParam:
+      name: pageSize
+      description: Number of items to be displayed per page
+      schema:
+        default: 20
+        maximum: 50
+        minimum: 1
+        type: integer
+      in: query
+      required: false
+    filterParam:
+      example: '''name''*''Fra''||*''Ger'',''numericCode''>''5'''
+      name: filter
+      description: Filter request results by specific criteria.
+      schema:
+        type: string
+      in: query
+      required: false
+    sortParam:
+      example: '-name'
+      name: sort
+      description: Sort request results by specific attribute.
+      schema:
+        type: string
+      in: query
+      required: false
+    languageParam:
+      example: en-US
+      name: language
+      description: Filter results by language type.
+      schema:
+        allOf:
+          - $ref: '#/components/schemas/_languageTypes'
+        type: string
+      in: query
+      required: false
+    destTokenParam:
+      name: dest-token
+      description: Auto-generated unique identifier representing a transfer destination, including prepaid cards, bank accounts, paper checks, and other users, prefixed with <i>dest->.
+      schema:
+        type: string
+        default: dest-4aed86e2-4929-45bf-814d-9030aef21e79
+        pattern: '^dest-[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$'
+      in: path
+      required: true
+      example: dest-4aed86e2-4929-45bf-814d-9030aef21e79
+    userTokenParam:
+      name: user-token
+      description: Auto-generated unique identifier representing a user, prefixed with <i>user-</i>.
+      schema:
+        type: string
+        default: user-f012bc86-4d42-415b-a8b2-be5e0b90e59a
+      in: path
+      required: true
+      example: user-f012bc86-4d42-415b-a8b2-be5e0b90e59a
+    spndTokenParam:
+      name: spnd-token
+      description: Auto-generated unique identifier representing an individual spendback transaction and quote, prefixed with <i>spnd-</i>.
+      schema:
+        type: string
+        default: spnd-c39437e1-dc80-4293-8211-c14b5a32f762
+        pattern: '^spnd-[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$'
+      in: path
+      required: true
+      example: spnd-c39437e1-dc80-4293-8211-c14b5a32f762
+    pmntTokenParam:
+      name: pmnt-token
+      description: Auto-generated unique identifier representing an individual payment transaction and quote, prefixed with <i>pmnt-</i>.
+      schema:
+        type: string
+        default: pmnt-d3ff8a0d-aec9-49a6-a95b-6191aebeca20
+        pattern: '^pmnt-[0-9A-Fa-f]{8}(?:-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$'
+      in: path
+      required: true
+      example: pmnt-d3ff8a0d-aec9-49a6-a95b-6191aebeca20
+    xferTokenParam:
+      name: xfer-token
+      description: Auto-generated unique identifier representing an individual transfer transaction, prefixed with <i>xfer-</i>.
+      schema:
+        type: string
+        default: xfer-0fac4aa8-43ac-447e-95f9-827f908a82ff
+      in: path
+      required: true
+      example: xfer-0fac4aa8-43ac-447e-95f9-827f908a82ff
+    acctTokenParam:
+      name: acct-token
+      description: Auto-generated unique identifier representing a company account, prefixed with <i>acct-</i>.
+      schema:
+        type: string
+      in: path
+      required: true
+      example: acct-b3f0570a-6586-4e00-8d6e-8a2bf93cfae4
+    docuTokenParam:
+      name: docu-token
+      description: Auto-generated unique identifier representing an uploaded document, prefixed with <i>docu-</i>.
+      schema:
+        type: string
+        default: docu-6260c132-5cb1-4e30-8b08-9ce559893acb
+      in: path
+      required: true
+      example: docu-6260c132-5cb1-4e30-8b08-9ce559893acb
+    webhTokenParam:
+      name: webh-token
+      description: Auto-generated unique identifier representing a webhook subscription, prefixed with <i>webh-</i>.
+      schema:
+        type: string
+        default: webh-2dd54a53-3814-4ce1-862f-dc06b09ead4a
+      in: path
+      required: true
+      example: docu-6260c132-5cb1-4e30-8b08-9ce559893acb
+    X-MyPayQuicker-Version:
+      name: X-MyPayQuicker-Version
+      schema:
+        type: string
+        default: 2020.02.24
+      in: header
+      required: true
+      example: 2020.02.24
+      description: Date-based API Version specified in the header <i>required</i> on all calls.
+    idvcTokenParam:
+      name: idvc-token
+      description: Auto-generated unique identifier representing a user IDV check, prefixed with <i>idvc-</i>.
+      schema:
+        type: string
+        default: idvc-7e7567e0-c2db-485d-896d-45901a10baa9
+      in: path
+      required: true
+      example: idvc-7e7567e0-c2db-485d-896d-45901a10baa9
+    webhookTokenParam:
+      name: webh-token
+      description: Auto-generated unique identifier representing a webhook subscription, prefixed with <i>webh-</i>.
+      in: path
+      required: true
+      schema:
+        type: string
+        default: webh-28491de2-5b22-4e30-028a-45901a10baa9
+      example: webh-28491de2-5b22-4e30-028a-45901a10baa9
+    programTokenParam:
+      name: prog-token
+      description: Auto-generated unique identifier representing a program, prefixed with <i>prog-</i>.
+      in: path
+      required: true
+      schema:
+        type: string
+        default: prog-4525ab9c-5b22-4e30-028a-45901a10aa0c
+      example: prog-4525ab9c-5b22-4e30-028a-45901a10aa0c
+    eventTokenParam:
+      name: evnt-token
+      description: Auto-generated unique identifier representing an event, prefixed with <i>evnt-</i>.
+      in: path
+      required: true
+      schema:
+        type: string
+        default: evnt-28491de2-5b22-4e30-028a-45901a10baa9
+      example: evnt-28491de2-5b22-4e30-028a-45901a10baa9
+    agreementTokenParam:
+      name: agmt-token
+      description: Auto-generated unique identifier representing a program agreement, prefixed with <i>agmt-</i>.
+      in: path
+      required: true
+      schema:
+        type: string
+        default: agmt-45901a10-5b22-4e30-028a-45901a10baa9
+      example: agmt-45901a10-5b22-4e30-028a-45901a10baa9
+    prepaidCardTokenParam:
+      name: token
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Token used as part of a two-leg card PIN reveal request sent directly from the client, generally involving a second piece of data such as the CVV code on the back of a card.
+    prepaidCardCvvParam:
+      name: cvc2
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Card Verification Value (CVV) located on the back of your credit card or debit card is a 3-digit number on VISA® and MasterCard® branded credit cards, and debit cards.
+    prepaidCardPinParam:
+      name: cardPin
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Prepaid card PIN for ATM and Debit usage
+    prepaidCardFormatParam:
+      name: format
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - TEXT
+          - IMAGE
+          - TEXT;IMAGE
+      description: Desired format for the prepaid card data.
+    prepaidCardSideParam:
+      name: side
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - FRONT
+          - BACK
+      description: Side to specify when retrieving a prepaid card's image data. *Required if IMAGE format specified.
+tags:
+  - name: Payments
+    description: Payment-related operations
+  - name: Transfers
+    description: Transfer-related operations
+  - name: Spend Back
+    description: Spendback-related operations
+  - name: Prepaid Cards
+    description: Prepaid Card-related operations
+  - name: Paper Checks
+    description: Paper check-related operations
+  - name: Bank Accounts
+    description: Bank account-related operations
+  - name: Balances
+    description: Balance-related operations
+  - name: Receipts
+    description: Receipt-related operations
+  - name: Accounts
+    description: Account-related operations
+  - name: Users
+    description: User-related operations
+  - name: Documents
+    description: Document-related operations
+  - name: IDV
+    description: Identity Verification-related operations
+  - name: Webhooks
+    description: Webhook-related operations
+  - name: Program
+security:
+  - API Key - 1: []
