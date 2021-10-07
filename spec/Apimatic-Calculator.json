@@ -6,7 +6,7 @@ info:
     email: support@payquicker.com
     url: 'https://www.payquicker.com'
     name: PayQuicker Support
-  description: desc updated
+  description: updated description for demo
   termsOfService: 'https://www.payquicker.com'
 servers:
   - url: 'https://platform.mypayquicker.build/api/v2'
