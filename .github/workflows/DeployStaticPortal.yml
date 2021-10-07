@@ -23,7 +23,7 @@ jobs:
       run: zip -qq -r portal-input.zip .
       
     - name: Call build endpoint
-      run: curl -X POST --url 'https://titan.apimatic.io/api/build' -F 'file=@portal-input.zip' -o portal-output.zip
+      run: curl -X POST --url 'https://www.apimatic.io/api' -H 'Authorization:uTmxzngzCkKBvmtmr_LcXRdyybHVKsGriJoZkRDtnzApz0A9PJEX6ORUZfq9HiUy' -F 'file=@portal-input.zip' -o portal-output.zip
       
     - name: list 
       run: ls
