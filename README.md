@@ -27,7 +27,7 @@ static\
 ```
 In addition to the above directory structure, the following constraints are also applied on the input ZIP archive:
 - APIMatic expects a file with name ending with APIMATIC-BUILD.json file in the root directory. For details on the contents of this file, check out our [documentation](https://portal-api-docs.apimatic.io/#/http/generating-api-portal/build-file). 
-- The spec folder must contain at least one API specification. This can be in any of the API specification formats support by APIMatic.
+- The spec folder must contain at least one API specification. This can be in any of the API specification formats supported by APIMatic.
 - content and static directories can be skipped if you do not have custom content or static files.
 
 ## Automation
@@ -35,7 +35,7 @@ In addition to the above directory structure, the following constraints are also
 This repository contains all the files required to generate a Documentation portal and conforms to the constraints described above.
 
 The contents of this GitHub repository need to be compressed into a ZIP archive and passed to the [Portal Generation](https://portal-api-docs.apimatic.io/#/http/api-endpoints/portal/generate-using-file) Endpoint.
-The result is another ZIP archive containing a static Documentation Portal. These files can be deployed to any static hosting platform such as Netlify.
+The result is another ZIP archive containing a static Documentation Portal. These files can be deployed to any web server or static hosting platform such as Netlify.
 
 This entire process is automated via the [DeployStaticPortal.yml](https://github.com/apimatic/static-portal-workflow/blob/master/.github/workflows/DeployStaticPortal.yml) workflow.
 
@@ -48,7 +48,10 @@ Once triggered, the contents of this repository are zipped and sent to the Porta
 
 First off you need to [generate an API KEY](https://docs.apimatic.io/manage-apis/get-api-keys/).
 
-Next, if you just want to quickly test out the API, zip the contents of this repository and use your favourite API Client to make an API call to the Portal Generation Endpoint :
+### Try via API Client  
+  
+  
+If you just want to quickly test out the API, zip the contents of this repository and use your favourite API Client to make an API call to the Portal Generation Endpoint :
 
 ```
 curl -X POST \
@@ -59,7 +62,10 @@ curl -X POST \
 
 You can deploy the response to any web server to view the sample Documentation Portal.
 
-If you want to try out the entire GitHub workflow instead, you will need to do the following:
+### Try via GitHub Actions
+
+  
+If you want to try out the entire GitHub workflow, you will need to do the following:
 1. Fork this repository  
 2. Create a new website on Netlify.
 3. Create the following Github Repository Secrets:  
@@ -68,7 +74,7 @@ If you want to try out the entire GitHub workflow instead, you will need to do t
     - NETLIFY_SITE_ID for the Site ID of the website you created in step 2 
 4. Trigger the 'Deploy Static Portal' workflow
 
-Once the workflow completes, your portal should be deployed on Netlify.
+Once the workflow completes, your portal should be deployed to Netlify.
 
 
 
