@@ -48,7 +48,7 @@ Once triggered, the contents of this repository are zipped and sent to the Porta
 
 First off you need to [generate an API KEY](https://docs.apimatic.io/manage-apis/get-api-keys/).
 
-### Try via API Client  
+### Try using API Client  
   
   
 If you just want to quickly test out the API, zip the contents of this repository and use your favourite API Client to make an API call to the Portal Generation Endpoint :
@@ -62,7 +62,7 @@ curl -X POST \
 
 You can deploy the response to any web server to view the sample Documentation Portal.
 
-### Try via GitHub Actions
+### Try using GitHub Actions
 
   
 If you want to try out the entire GitHub workflow, you will need to do the following:
