@@ -46,7 +46,7 @@ Once triggered, the contents of this repository are zipped and sent to the Porta
 
 ## Cool, How do I try it out ?
 
-First off you need to [generate an API KEY](https://docs.apimatic.io/manage-apis/get-api-keys/).
+First off you need to [generate an API KEY](https://portal-api-docs.apimatic.io/#/http/generating-api-portal/auth-keys).
 
 ### Try using API Client  
   
