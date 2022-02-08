@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publis-sdk:
+  publish-sdk:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +44,7 @@ jobs:
        with:
         repository: 'apimatic/static-portal-sdk'
         ref: 'main'
-        token: ${{ secrets.ACTIONS_PAT }}
+        token: ${{secrets.GITHUB_TOKEN}}
         path: 'sdk'
           
      - name: Extract generated SDK
@@ -52,7 +52,7 @@ jobs:
        run: unzip -qq java-sdk.zip -d java-sdk
     
      - name: Copy SDK files
-       working-directory: 'spec/ts-sdk/Apimatic API'
+       working-directory: 'spec/java-sdk/Apimatic API'
        run: cp -r -f -a . ../../../sdk --verbose
       
      - name: Push updated SDK
