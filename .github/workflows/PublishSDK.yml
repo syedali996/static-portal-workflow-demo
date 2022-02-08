@@ -1,4 +1,4 @@
-name: Publish TS SDK for latest API spec
+name: Publish Java SDK
 
 on:
   push:
@@ -44,7 +44,7 @@ jobs:
        with:
         repository: 'apimatic/static-portal-sdk'
         ref: 'main'
-        token: ${{secrets.GITHUB_TOKEN}}
+        token: ${{secrets.ACTIONS_PAT}}
         path: 'sdk'
           
      - name: Extract generated SDK
