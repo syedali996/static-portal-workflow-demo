@@ -64,12 +64,12 @@ jobs:
        working-directory: 'spec'
        run: unzip -qq java-sdk.zip -d java-sdk
     
-     - name: Copy SDK files
-       working-directory: 'spec/java-sdk/Apimatic API'
-       run: cp -r -f -a . ../../../sdk --verbose
+    #  - name: Copy SDK files
+    #    working-directory: 'spec/java-sdk'
+    #    run: cp -r -f -a . ../../../sdk --verbose
       
      - name: Push updated SDK
-       working-directory: 'sdk'
+       working-directory: 'java-sdk'
        run: |
          git add .
          git config --global user.name 'sohaibtariq'
