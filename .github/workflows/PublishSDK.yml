@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-     - name: Make new directory
-       run: mkdir spec
+    #  - name: Make new directory
+    #    run: mkdir spec
        
     #  - name: Checkout main branch
     #    uses: actions/checkout@v2
@@ -23,6 +23,9 @@ jobs:
      
      - name: Install zip
        uses: montudor/action-zip@v0.1.1
+
+     - name: Install jq
+       run: sudo apt-get install jq    
       
      - uses: actions/checkout@v1
        name : checkout-repo
@@ -38,10 +41,11 @@ jobs:
      - name: Generate SDK
        working-directory: 'spec'
       #  run: curl -X POST --url 'https://www.apimatic.io/api/code-generations/generate-via-file' -H 'Accept:application/json' -H 'Authorization:X-Auth-Key ${{ secrets.API_KEY }}' -F 'file=@api-spec.zip'  -F 'template=JAVA_ECLIPSE_JRE_LIB' -o java-sdk.zip
-       run: curl -X POST --url "https://www.apimatic.io/api/code-generations/generate-via-file" --header  "Authorization:X-Auth-Key ${{ secrets.API_KEY }}" --header "Accept:application/json" --header "content-type:multipart/form-data"  --form "file=@api-spec.zip"  --form "template=JAVA_ECLIPSE_JRE_LIB" -o output.json
+       run: curl -v -X POST --url "https://www.apimatic.io/api/code-generations/generate-via-file" --header  "Authorization:X-Auth-Key ${{ secrets.API_KEY }}" --header "Accept:application/json" --header "content-type:multipart/form-data"  --form "file=@api-spec.zip"  --form "template=JAVA_ECLIPSE_JRE_LIB" -o output.json
     
      - name: Parse output
        id: parse_output
+       working-directory: 'spec'
        run: echo '::set-output name=codegenId::'$(jq -r '.id' output.json)
    
      - name: Download SDK
