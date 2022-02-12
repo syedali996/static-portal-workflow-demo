@@ -52,27 +52,40 @@ jobs:
        working-directory: 'spec'
        run: curl -X GET --url "https://www.apimatic.io/api/code-generations/${{ steps.parse_output.outputs.codegenId }}/generated-sdk" --header "Authorization:X-Auth-Key ${{ secrets.API_KEY }}" -o java-sdk.zip
     
+     - name: list 
+       run: ls
+       working-directory: 'spec'
+        
+     - name: Extract generated SDK
+       working-directory: 'spec'
+       run: unzip -qq java-sdk.zip -d java-sdk
+
+     - name: list 
+       run: ls
+       working-directory: 'spec'
+
+       
      - name: Check-out static-portal-sdk repo
        uses: actions/checkout@v2
        with:
         repository: 'apimatic/static-portal-sdk'
         ref: 'master'
         token: ${{secrets.ACTIONS_PAT}}
-        path: 'sdk'
-          
-     - name: Extract generated SDK
-       working-directory: 'spec'
-       run: unzip -qq java-sdk.zip -d java-sdk
-    
-    #  - name: Copy SDK files
-    #    working-directory: 'spec/java-sdk'
-    #    run: cp -r -f -a . ../../../sdk --verbose
+        path: sdk-repo
       
+     - name: list 
+       run: ls 
+        
+     - name: Copy SDK files
+       working-directory: 'spec/java-sdk'
+       run: cp -r -f -a . ../../sdk-repo --verbose
+      
+        
      - name: Push updated SDK
-       working-directory: 'java-sdk'
+       working-directory: 'sdk-repo'
        run: |
          git add .
          git config --global user.name 'sohaibtariq'
          git config --global user.email 'sohaib.tariq@apimatic.com'
          git commit -m "updated via github CI"
-         git push origin main     
+         git push origin master     
