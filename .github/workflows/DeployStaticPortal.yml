@@ -11,10 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
-#     - name: Install zip
-#       uses: montudor/action-zip@v0.1.1
-      
+       
     - uses: actions/checkout@v1
       name : checkout-repo
       id: checkout-repo  
