@@ -44,7 +44,7 @@ by pushing a change to the master branch of this repository.
 Once triggered, the contents of this repository are zipped and sent to the Portal Generation Endpoint via curl. The response received from this endpoint is unzipped and deployed to Netlify.
 
 
-## Cool, How do I try it out ?
+## Cool, How do I try it out !
 
 First off you need to [generate an API KEY](https://portal-api-docs.apimatic.io/#/http/generating-api-portal/auth-keys).
 
