@@ -6,7 +6,7 @@
             "publishReport": true
         },
         "pageTitle": "My Portal Title",
-        "navTitle": "My Navigation Title",
+        "navTitle": "My CI/CD Pipeline",
         "logoUrl": "static/images/logo.png",
         "logoLink": "https://www.payquicker.com",
         "languageConfig": {
